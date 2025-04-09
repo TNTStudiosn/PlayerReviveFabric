@@ -4,8 +4,6 @@
   "package": "com.TNTStudios.playerrevivefabric.client.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "DeathScreenMixin",
-    "ClientInteractEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
