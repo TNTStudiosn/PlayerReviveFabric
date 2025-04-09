@@ -16,14 +16,20 @@ public abstract class ServerPlayerMixin {
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
 
-        // Evita que el jugador muera, lo deja en estado "tumbado"
-        if (player.getHealth() - amount <= 0 && !PlayerReviveData.isDowned(player.getUuid())) {
+        // Si ya está tumbado, cancelar daño completamente
+        if (PlayerReviveData.isDowned(player.getUuid())) {
+            cir.setReturnValue(false);
+            return;
+        }
+
+        // Si el daño lo mataría, lo tumbamos
+        if (player.getHealth() - amount <= 0) {
             player.setHealth(1.0F);
-            player.setSwimming(true); // Pose de tumbado
-            player.setVelocity(Vec3d.ZERO); // Detener movimiento
+            player.setSwimming(true);
+            player.setVelocity(Vec3d.ZERO);
             player.velocityModified = true;
             PlayerReviveData.setDowned(player.getUuid(), true);
-            cir.setReturnValue(false); // Cancela la muerte
+            cir.setReturnValue(false);
         }
     }
 }
