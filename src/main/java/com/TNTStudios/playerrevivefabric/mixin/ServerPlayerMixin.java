@@ -1,6 +1,7 @@
 package com.TNTStudios.playerrevivefabric.mixin;
 
 import com.TNTStudios.playerrevivefabric.revive.PlayerReviveData;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
@@ -22,14 +23,10 @@ public abstract class ServerPlayerMixin {
             return;
         }
 
-        // Si el daño lo mataría, lo tumbamos
-        if (player.getHealth() - amount <= 0) {
-            player.setHealth(1.0F);
-            player.setSwimming(true);
-            player.setVelocity(Vec3d.ZERO);
-            player.velocityModified = true;
+
+
             PlayerReviveData.setDowned(player.getUuid(), true);
             cir.setReturnValue(false);
-        }
+
     }
 }
