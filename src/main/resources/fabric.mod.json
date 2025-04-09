@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "playerrevivefabric",
+  "version": "${version}",
+  "name": "PlayerReviveFabric",
+  "description": "Revive jugadores antes que acabe el tiempo",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/playerrevivefabric/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.TNTStudios.playerrevivefabric.client.PlayerrevivefabricClient"
+    ],
+    "main": [
+      "com.TNTStudios.playerrevivefabric.Playerrevivefabric"
+    ]
+  },
+  "mixins": [
+    "playerrevivefabric.mixins.json",
+    {
+      "config": "playerrevivefabric.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
