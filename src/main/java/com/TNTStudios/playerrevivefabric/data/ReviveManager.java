@@ -81,8 +81,13 @@ public class ReviveManager {
         downedPlayers.remove(uuid);
 
         player.changeGameMode(GameMode.SURVIVAL);
-        player.setHealth(0); // Esto sí aplicará muerte real
+        player.setHealth(0);
+
+        // 🔁 Notifica al cliente que deje de estar en estado "downed"
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        ServerPlayNetworking.send(player, ModPackets.CLEAR_DOWNED, buf);
     }
+
 
     public static void tick(ServerWorld world) {
         long now = System.currentTimeMillis();

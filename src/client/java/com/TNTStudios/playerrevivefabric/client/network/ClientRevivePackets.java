@@ -14,6 +14,7 @@ public class ClientRevivePackets {
 
     public static final Identifier REVIVE_ATTEMPT = new Identifier("playerrevivefabric", "revive_attempt");
     public static final Identifier SET_DOWNED = new Identifier("playerrevivefabric", "set_downed");
+    public static final Identifier CLEAR_DOWNED = new Identifier("playerrevivefabric", "clear_downed");
 
     public static void sendReviveAttempt(PlayerEntity target) {
         PacketByteBuf buf = new PacketByteBuf(io.netty.buffer.Unpooled.buffer());
@@ -23,10 +24,20 @@ public class ClientRevivePackets {
 
     public static void registerS2CPackets() {
         ClientPlayNetworking.registerGlobalReceiver(SET_DOWNED, (client, handler, buf, responseSender) -> {
-            long duration = buf.readLong(); // reviveTimeMs enviado por el server
+            long duration = buf.readLong();
             client.execute(() -> {
                 ClientReviveState.isDowned = true;
                 client.setScreen(new ReviveScreen(duration));
+            });
+        });
+
+        // Cierra pantalla y resetea estado al morir forzadamente
+        ClientPlayNetworking.registerGlobalReceiver(CLEAR_DOWNED, (client, handler, buf, responseSender) -> {
+            client.execute(() -> {
+                ClientReviveState.isDowned = false;
+                if (client.currentScreen instanceof ReviveScreen) {
+                    client.setScreen(null);
+                }
             });
         });
     }

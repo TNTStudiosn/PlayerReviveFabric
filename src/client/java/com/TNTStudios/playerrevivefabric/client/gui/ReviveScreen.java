@@ -33,8 +33,13 @@ public class ReviveScreen extends Screen {
     }
 
     private void forceDeath() {
-        MinecraftClient.getInstance().player.networkHandler.sendChatCommand("acceptdeath"); // Lo implementaremos como comando
+        MinecraftClient client = MinecraftClient.getInstance();
+        if (client.player != null) {
+            client.player.networkHandler.sendChatCommand("acceptdeath");
+            client.setScreen(null); // Cierra la pantalla
+        }
     }
+
 
     @Override
     public void tick() {
