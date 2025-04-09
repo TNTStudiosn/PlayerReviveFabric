@@ -4,6 +4,8 @@
   "package": "com.TNTStudios.playerrevivefabric.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ServerPlayerMixin",
+    "LivingEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
