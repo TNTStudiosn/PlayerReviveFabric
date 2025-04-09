@@ -2,11 +2,16 @@ package com.TNTStudios.playerrevivefabric.events;
 
 import com.TNTStudios.playerrevivefabric.config.ReviveConfig;
 import com.TNTStudios.playerrevivefabric.data.ReviveManager;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameRules;
 
 import java.util.HashSet;
@@ -18,23 +23,24 @@ public class DeathEventHandler {
     private static final Set<ServerPlayerEntity> processedThisTick = new HashSet<>();
 
     public static void init() {
-        // Evento por tick para limpiar jugadores procesados
         ServerTickEvents.END_SERVER_TICK.register(server -> processedThisTick.clear());
-    }
 
-    public static ActionResult onPlayerDamaged(ServerPlayerEntity player, DamageSource source, float amount) {
-        if (processedThisTick.contains(player)) return ActionResult.PASS;
-        processedThisTick.add(player);
-
-        if (amount >= player.getHealth()) {
-            if (!ReviveManager.isDowned(player)) {
-                ReviveManager.downPlayer(player);
-                // ✅ PERMITIMOS la muerte, pero ya sabremos que está en estado downed
+        ServerLivingEntityEvents.ALLOW_DEATH.register((entity, source, amount) -> {
+            if (entity instanceof ServerPlayerEntity player) {
+                if (!ReviveManager.isDowned(player)) {
+                    ReviveManager.downPlayer(player);
+                    // ✅ Mantenerlo vivo
+                    player.setHealth(1.0f); // mínima vida
+                    player.setNoGravity(true);
+                    player.setVelocity(Vec3d.ZERO);
+                    player.setPose(EntityPose.SWIMMING);
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 100000, 255, false, false));
+                    player.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 100000, 255, false, false));
+                    return false; // ❌ CANCELAR MUERTE
+                }
             }
-        }
-        return ActionResult.PASS;
-
-
+            return true;
+        });
     }
 
 

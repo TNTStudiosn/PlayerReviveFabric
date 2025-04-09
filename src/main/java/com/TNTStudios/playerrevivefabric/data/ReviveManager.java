@@ -4,6 +4,8 @@ import com.TNTStudios.playerrevivefabric.config.ReviveConfig;
 import com.TNTStudios.playerrevivefabric.network.ModPackets;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.entity.EntityPose;
+import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketByteBuf;
@@ -11,6 +13,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -37,10 +40,16 @@ public class ReviveManager {
 
         downedPlayers.put(uuid, new DownedPlayerData(System.currentTimeMillis(), player.getInventory(), player.getBlockPos()));
 
-        // Enviar paquete para pantalla de revive
+        // Enviar paquete para mostrar pantalla
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeLong(ReviveConfig.reviveTimeMs);
         ServerPlayNetworking.send(player, ModPackets.SET_DOWNED, buf);
+
+        player.setNoGravity(true);
+        player.setPose(EntityPose.SWIMMING);
+        player.setVelocity(Vec3d.ZERO);
+        player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 100000, 255, false, false));
+        player.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 100000, 255, false, false));
 
         player.sendMessage(Text.literal("§cHas sido derribado. Espera a ser revivido o acepta tu muerte."), false);
     }
@@ -53,22 +62,29 @@ public class ReviveManager {
 
     public static void revivePlayer(ServerPlayerEntity player) {
         downedPlayers.remove(player.getUuid());
-        player.setHealth(8.0F); // Revive con vida
-        player.sendMessage(Text.literal("§a¡Has sido revivido!"), false);
+        player.setNoGravity(false);
+        player.setPose(EntityPose.STANDING);
+        player.setHealth(8.0F);
+        player.clearStatusEffects();
 
-        // Limpiar pantalla en cliente
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         ServerPlayNetworking.send(player, ModPackets.CLEAR_DOWNED, buf);
+
+        player.sendMessage(Text.literal("§a¡Has sido revivido!"), false);
     }
+
 
 
     public static void forceDeath(ServerPlayerEntity player) {
         downedPlayers.remove(player.getUuid());
-        player.setHealth(0); // Morir naturalmente
+        player.setNoGravity(false);
+        player.setHealth(0.0F); // morir como si fuera vanilla
+        player.clearStatusEffects();
 
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         ServerPlayNetworking.send(player, ModPackets.CLEAR_DOWNED, buf);
     }
+
 
 
 
