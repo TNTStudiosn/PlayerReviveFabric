@@ -5,8 +5,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerReviveData {
-    private static final Set<UUID> downedPlayers =
-            ConcurrentHashMap.newKeySet();
+    private static final Set<UUID> downedPlayers = ConcurrentHashMap.newKeySet();
 
     public static boolean isDowned(UUID playerId) {
         return downedPlayers.contains(playerId);

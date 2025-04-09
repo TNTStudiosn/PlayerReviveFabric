@@ -4,7 +4,6 @@ import com.TNTStudios.playerrevivefabric.revive.PlayerReviveData;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,16 +16,17 @@ public abstract class ServerPlayerMixin {
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
 
-        // Si ya está tumbado, cancelar daño completamente
+        // (1) Si ya está tumbado, cancela daño
         if (PlayerReviveData.isDowned(player.getUuid())) {
             cir.setReturnValue(false);
             return;
         }
 
-
-
+        // (2) Si el golpe mataría al jugador, evitar la muerte y marcarlo "downed"
+        if (player.getHealth() - amount <= 0.0F) {
             PlayerReviveData.setDowned(player.getUuid(), true);
-            cir.setReturnValue(false);
+            cir.setReturnValue(false); // no muere
+        }
 
     }
 }

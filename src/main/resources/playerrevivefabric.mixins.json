@@ -6,7 +6,8 @@
   "mixins": [
     "ServerPlayerMixin",
     "LivingEntityMixin",
-    "ServerPlayerTickMixin"
+    "ServerPlayerTickMixin",
+    "SwimmingPoseMixin"
   ],
   "injectors": {
     "defaultRequire": 1

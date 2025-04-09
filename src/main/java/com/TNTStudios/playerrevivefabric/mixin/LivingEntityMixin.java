@@ -15,7 +15,7 @@ public abstract class LivingEntityMixin {
     @Inject(method = "tryAttack", at = @At("HEAD"), cancellable = true)
     private void cancelAttackOnDownedPlayer(Entity target, CallbackInfoReturnable<Boolean> cir) {
         if (target instanceof PlayerEntity player && PlayerReviveData.isDowned(player.getUuid())) {
-            cir.setReturnValue(false); // Cancela el ataque si el jugador está tumbado
+            cir.setReturnValue(false); // Cancela el ataque
         }
     }
 }
