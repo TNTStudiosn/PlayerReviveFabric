@@ -17,8 +17,12 @@ public class DropMixin {
         PlayerInventory inventory = (PlayerInventory)(Object)this;
         PlayerEntity player = inventory.player;
 
-        if (player instanceof ServerPlayerEntity serverPlayer && ReviveManager.isDowned(serverPlayer)) {
+        if (player instanceof ServerPlayerEntity serverPlayer
+                && ReviveManager.isDowned(serverPlayer)
+                && serverPlayer.isAlive()) {
+            // 🚫 Solo bloquea si el jugador está downed y aún NO ha muerto del todo
             ci.cancel();
         }
     }
 }
+
