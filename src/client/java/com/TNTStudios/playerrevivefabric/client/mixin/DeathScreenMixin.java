@@ -1,5 +1,6 @@
 package com.TNTStudios.playerrevivefabric.client.mixin;
 
+import com.TNTStudios.playerrevivefabric.client.ClientReviveState;
 import com.TNTStudios.playerrevivefabric.client.gui.ReviveScreen;
 import com.TNTStudios.playerrevivefabric.config.ReviveConfig;
 import com.TNTStudios.playerrevivefabric.data.ReviveManager;
@@ -12,6 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(DeathScreen.class)
 public abstract class DeathScreenMixin extends Screen {
@@ -28,7 +30,7 @@ public abstract class DeathScreenMixin extends Screen {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity player = client.player;
 
-        if (player != null && ReviveManager.isDowned(player)) {
+        if (player != null && ClientReviveState.isDowned) {
             // Mostramos nuestra pantalla personalizada
             client.setScreen(new ReviveScreen(ReviveConfig.reviveTimeMs));
             ci.cancel(); // Cancelamos el init vanilla para evitar botones innecesarios
@@ -41,7 +43,7 @@ public abstract class DeathScreenMixin extends Screen {
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void blockTickIfDowned(CallbackInfo ci) {
         PlayerEntity player = MinecraftClient.getInstance().player;
-        if (player != null && ReviveManager.isDowned(player)) {
+        if (player != null && ClientReviveState.isDowned) {
             ci.cancel(); // Impide que se activen botones vanilla
         }
     }
@@ -52,7 +54,7 @@ public abstract class DeathScreenMixin extends Screen {
     @Inject(method = "shouldCloseOnEsc", at = @At("HEAD"), cancellable = true)
     private void blockEscIfDowned(CallbackInfoReturnable<Boolean> cir) {
         PlayerEntity player = MinecraftClient.getInstance().player;
-        if (player != null && ReviveManager.isDowned(player)) {
+        if (player != null && ClientReviveState.isDowned) {
             // Bloquea cerrar pantalla con ESC si el jugador está tirado
             cir.setReturnValue(false);
         }

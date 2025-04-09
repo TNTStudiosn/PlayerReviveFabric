@@ -3,6 +3,7 @@ package com.TNTStudios.playerrevivefabric;
 import com.TNTStudios.playerrevivefabric.commands.AcceptDeathCommand;
 import com.TNTStudios.playerrevivefabric.config.ReviveConfig;
 import com.TNTStudios.playerrevivefabric.events.DeathEventHandler;
+import com.TNTStudios.playerrevivefabric.network.RevivePackets;
 import com.TNTStudios.playerrevivefabric.server.PlayerReviveHandler;
 import com.TNTStudios.playerrevivefabric.data.ReviveManager;
 import net.fabricmc.api.ModInitializer;
@@ -18,6 +19,7 @@ public class Playerrevivefabric implements ModInitializer {
         ReviveConfig.load();
 
         DeathEventHandler.init();
+        RevivePackets.registerC2SPackets();
 
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerWorld world : server.getWorlds()) {
