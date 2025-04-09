@@ -26,15 +26,14 @@ public class DeathEventHandler {
         if (processedThisTick.contains(player)) return ActionResult.PASS;
         processedThisTick.add(player);
 
-        // Si el daño sería letal...
         if (amount >= player.getHealth()) {
             if (!ReviveManager.isDowned(player)) {
-                ReviveManager.downPlayer(player);
-                return ActionResult.FAIL; // Cancelar daño letal
+                ReviveManager.downPlayer(player); // Solo marca como down y manda paquete
             }
         }
-        return ActionResult.PASS;
+        return ActionResult.PASS; // Siempre permitir que muera
     }
+
 
     public static void handleRespawnTimeouts(ServerWorld world) {
         ReviveManager.tick(world); // Tiempos y revivir/respawn forzado

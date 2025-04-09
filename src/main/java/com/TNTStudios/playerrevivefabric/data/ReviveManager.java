@@ -35,18 +35,9 @@ public class ReviveManager {
     public static void downPlayer(ServerPlayerEntity player) {
         UUID uuid = player.getUuid();
 
-        PlayerInventory inventoryCopy = new PlayerInventory(null);
-        for (int i = 0; i < player.getInventory().size(); i++) {
-            inventoryCopy.setStack(i, player.getInventory().getStack(i).copy());
-        }
+        downedPlayers.put(uuid, new DownedPlayerData(System.currentTimeMillis(), player.getInventory(), player.getBlockPos()));
 
-        downedPlayers.put(uuid, new DownedPlayerData(System.currentTimeMillis(), inventoryCopy, player.getBlockPos()));
-
-        player.setHealth(1.0F);
-        player.changeGameMode(GameMode.SPECTATOR);
-        player.getInventory().clear();
-
-        // ✅ Crear y enviar el paquete
+        // Enviar paquete para pantalla de revive
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         buf.writeLong(ReviveConfig.reviveTimeMs);
         ServerPlayNetworking.send(player, ModPackets.SET_DOWNED, buf);
@@ -55,38 +46,30 @@ public class ReviveManager {
     }
 
 
+
     public static boolean isDowned(ServerPlayerEntity player) {
         return downedPlayers.containsKey(player.getUuid());
     }
 
     public static void revivePlayer(ServerPlayerEntity player) {
-        UUID uuid = player.getUuid();
-        DownedPlayerData data = downedPlayers.get(uuid);
-        if (data == null) return;
-
-        // Restaurar inventario
-        for (int i = 0; i < data.savedInventory.size(); i++) {
-            player.getInventory().setStack(i, data.savedInventory.getStack(i).copy());
-        }
-
-        player.changeGameMode(GameMode.SURVIVAL);
-        player.setHealth(8.0F); // Revivido con 4 corazones
-
-        downedPlayers.remove(uuid);
+        downedPlayers.remove(player.getUuid());
+        player.setHealth(8.0F); // Revive con vida
         player.sendMessage(Text.literal("§a¡Has sido revivido!"), false);
-    }
 
-    public static void forceDeath(ServerPlayerEntity player) {
-        UUID uuid = player.getUuid();
-        downedPlayers.remove(uuid);
-
-        player.changeGameMode(GameMode.SURVIVAL);
-        player.setHealth(0);
-
-        // 🔁 Notifica al cliente que deje de estar en estado "downed"
+        // Limpiar pantalla en cliente
         PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
         ServerPlayNetworking.send(player, ModPackets.CLEAR_DOWNED, buf);
     }
+
+
+    public static void forceDeath(ServerPlayerEntity player) {
+        downedPlayers.remove(player.getUuid());
+        player.setHealth(0); // Morir naturalmente
+
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        ServerPlayNetworking.send(player, ModPackets.CLEAR_DOWNED, buf);
+    }
+
 
 
     public static void tick(ServerWorld world) {

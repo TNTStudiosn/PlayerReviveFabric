@@ -22,42 +22,29 @@ public abstract class DeathScreenMixin extends Screen {
         super(NarratorManager.EMPTY);
     }
 
-    /**
-     * Reemplaza la pantalla de muerte vanilla por la pantalla personalizada solo si el jugador está en estado downed.
-     */
+    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+    private void blockVanillaTick(CallbackInfo ci) {
+        PlayerEntity player = MinecraftClient.getInstance().player;
+        if (player != null && ClientReviveState.isDowned) {
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "init", at = @At("HEAD"), cancellable = true)
-    private void replaceIfDowned(CallbackInfo ci) {
+    private void overrideDeathScreen(CallbackInfo ci) {
         MinecraftClient client = MinecraftClient.getInstance();
         PlayerEntity player = client.player;
-
         if (player != null && ClientReviveState.isDowned) {
-            // Mostramos nuestra pantalla personalizada
             client.setScreen(new ReviveScreen(ReviveConfig.reviveTimeMs));
-            ci.cancel(); // Cancelamos el init vanilla para evitar botones innecesarios
+            ci.cancel();
         }
     }
 
-    /**
-     * Impide que se muestren botones vanilla si el jugador está downed (seguridad extra por si algún mod u override llama `init` luego).
-     */
-    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
-    private void blockTickIfDowned(CallbackInfo ci) {
-        PlayerEntity player = MinecraftClient.getInstance().player;
-        if (player != null && ClientReviveState.isDowned) {
-            ci.cancel(); // Impide que se activen botones vanilla
-        }
-    }
-
-    /**
-     * Opcional: previene que la pantalla se cierre con ESC mientras estás derribado.
-     */
     @Inject(method = "shouldCloseOnEsc", at = @At("HEAD"), cancellable = true)
-    private void blockEscIfDowned(CallbackInfoReturnable<Boolean> cir) {
-        PlayerEntity player = MinecraftClient.getInstance().player;
-        if (player != null && ClientReviveState.isDowned) {
-            // Bloquea cerrar pantalla con ESC si el jugador está tirado
+    private void preventEscClose(CallbackInfoReturnable<Boolean> cir) {
+        if (ClientReviveState.isDowned) {
             cir.setReturnValue(false);
         }
     }
-
 }
+
