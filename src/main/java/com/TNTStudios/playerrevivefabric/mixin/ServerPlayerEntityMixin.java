@@ -9,23 +9,22 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-// Mixin para manipular el movimiento y los ataques del jugador
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin {
 
-    // Apunta a la función tick (o cualquier función similar de movimiento)
+    // Interceptamos el método "tick" para cancelar el movimiento si el jugador está "downed"
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void preventMovementIfDowned(CallbackInfo ci) {
         ServerPlayerEntity player = (ServerPlayerEntity)(Object)this;
 
-        // Si el jugador está "downed", prevenimos el movimiento
+        // Si el jugador está "downed", cancelamos el movimiento
         if (ReviveManager.isDowned(player)) {
-            player.setVelocity(Vec3d.ZERO);  // Detener el movimiento
-            ci.cancel();  // Cancelamos la ejecución del tick normal
+            player.setVelocity(Vec3d.ZERO);  // Establecemos la velocidad a cero para evitar movimiento
+            ci.cancel();  // Cancelamos el tick normal (evitamos que el jugador se mueva)
         }
     }
 
-    // Evita que el jugador ataque si está "downed"
+    // Interceptamos el método de ataque para evitar que ataque si está "downed"
     @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
     private void preventAttackIfDowned(Entity target, CallbackInfo ci) {
         ServerPlayerEntity player = (ServerPlayerEntity)(Object)this;
