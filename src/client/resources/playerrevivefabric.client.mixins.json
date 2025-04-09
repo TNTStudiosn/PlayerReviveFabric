@@ -4,8 +4,6 @@
   "package": "com.TNTStudios.playerrevivefabric.client.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
-    "SwimmingPoseMixin",
-    "EntitySwimmingMixin"
   ],
   "injectors": {
     "defaultRequire": 1

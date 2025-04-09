@@ -1,7 +1,6 @@
-package com.TNTStudios.playerrevivefabric.client.mixin;
+package com.TNTStudios.playerrevivefabric.mixin;
 
-import com.TNTStudios.playerrevivefabric.client.PlayerReviveClientState;
-import net.minecraft.client.MinecraftClient;
+import com.TNTStudios.playerrevivefabric.revive.PlayerReviveData;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,13 +12,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class SwimmingPoseMixin {
 
     @Inject(method = "isInSwimmingPose", at = @At("HEAD"), cancellable = true)
-    private void forceSwimmingPoseClient(CallbackInfoReturnable<Boolean> cir) {
+    private void forceSwimmingPoseServerAndClient(CallbackInfoReturnable<Boolean> cir) {
         Entity self = (Entity)(Object)this;
 
-        // Solo modificar si es el jugador local
-        if (self instanceof PlayerEntity player &&
-                player == MinecraftClient.getInstance().player &&
-                PlayerReviveClientState.isDowned()) {
+        if (self instanceof PlayerEntity player && PlayerReviveData.isDowned(player.getUuid())) {
             cir.setReturnValue(true);
         }
     }
