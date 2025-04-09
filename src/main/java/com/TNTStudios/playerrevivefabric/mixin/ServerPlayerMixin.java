@@ -1,5 +1,6 @@
 package com.TNTStudios.playerrevivefabric.mixin;
 
+import com.TNTStudios.playerrevivefabric.network.PlayerReviveNetwork;
 import com.TNTStudios.playerrevivefabric.revive.PlayerReviveData;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.entity.damage.DamageSource;
@@ -25,6 +26,7 @@ public abstract class ServerPlayerMixin {
         // (2) Si el golpe mataría al jugador, evitar la muerte y marcarlo "downed"
         if (player.getHealth() - amount <= 0.0F) {
             PlayerReviveData.setDowned(player.getUuid(), true);
+            PlayerReviveNetwork.sendDownedState(player, true); // Enviar al cliente
             cir.setReturnValue(false); // no muere
         }
 
