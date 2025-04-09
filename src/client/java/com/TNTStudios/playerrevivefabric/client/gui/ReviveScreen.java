@@ -6,6 +6,8 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import com.TNTStudios.playerrevivefabric.client.ClientReviveState;
+
 
 public class ReviveScreen extends Screen {
 
@@ -20,6 +22,7 @@ public class ReviveScreen extends Screen {
 
     @Override
     protected void init() {
+        ClientReviveState.isDowned = true;
         int centerX = this.width / 2;
         int centerY = this.height / 2;
 
@@ -64,4 +67,11 @@ public class ReviveScreen extends Screen {
     public boolean shouldPause() {
         return false;
     }
+
+    @Override
+    public void removed() {
+        ClientReviveState.isDowned = false;
+        super.removed();
+    }
+
 }
