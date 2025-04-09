@@ -1,8 +1,12 @@
 package com.TNTStudios.playerrevivefabric.data;
 
 import com.TNTStudios.playerrevivefabric.config.ReviveConfig;
+import com.TNTStudios.playerrevivefabric.network.ModPackets;
+import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -31,7 +35,6 @@ public class ReviveManager {
     public static void downPlayer(ServerPlayerEntity player) {
         UUID uuid = player.getUuid();
 
-        // Guardar inventario
         PlayerInventory inventoryCopy = new PlayerInventory(null);
         for (int i = 0; i < player.getInventory().size(); i++) {
             inventoryCopy.setStack(i, player.getInventory().getStack(i).copy());
@@ -41,13 +44,16 @@ public class ReviveManager {
 
         player.setHealth(1.0F);
         player.changeGameMode(GameMode.SPECTATOR);
+        player.getInventory().clear();
 
-        player.getInventory().clear(); // Inventario real vacío mientras está downed
-
-        // Puedes añadir aquí efectos visuales si deseas
+        // ✅ Crear y enviar el paquete
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        buf.writeLong(ReviveConfig.reviveTimeMs);
+        ServerPlayNetworking.send(player, ModPackets.SET_DOWNED, buf);
 
         player.sendMessage(Text.literal("§cHas sido derribado. Espera a ser revivido o acepta tu muerte."), false);
     }
+
 
     public static boolean isDowned(ServerPlayerEntity player) {
         return downedPlayers.containsKey(player.getUuid());

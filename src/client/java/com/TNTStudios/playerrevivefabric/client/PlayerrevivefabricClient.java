@@ -8,5 +8,6 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientRevivePackets.REVIVE_ATTEMPT.toString();
+        ClientRevivePackets.registerS2CPackets();
     }
 }
