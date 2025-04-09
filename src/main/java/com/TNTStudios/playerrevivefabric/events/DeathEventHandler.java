@@ -28,10 +28,13 @@ public class DeathEventHandler {
 
         if (amount >= player.getHealth()) {
             if (!ReviveManager.isDowned(player)) {
-                ReviveManager.downPlayer(player); // Solo marca como down y manda paquete
+                ReviveManager.downPlayer(player);
+                // ✅ PERMITIMOS la muerte, pero ya sabremos que está en estado downed
             }
         }
-        return ActionResult.PASS; // Siempre permitir que muera
+        return ActionResult.PASS;
+
+
     }
 
 
