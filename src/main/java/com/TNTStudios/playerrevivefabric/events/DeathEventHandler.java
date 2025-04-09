@@ -12,7 +12,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.GameRules;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,6 +24,7 @@ public class DeathEventHandler {
     public static void init() {
         ServerTickEvents.END_SERVER_TICK.register(server -> processedThisTick.clear());
 
+        // Manejo de muerte y daño a los jugadores
         ServerLivingEntityEvents.ALLOW_DEATH.register((entity, source, amount) -> {
             if (entity instanceof ServerPlayerEntity player) {
                 if (!ReviveManager.isDowned(player)) {
@@ -39,10 +39,9 @@ public class DeathEventHandler {
                     return false; // ❌ CANCELAR MUERTE
                 }
             }
-            return true;
+            return true; // Si ya está en estado downed, permitimos la muerte
         });
     }
-
 
     public static void handleRespawnTimeouts(ServerWorld world) {
         ReviveManager.tick(world); // Tiempos y revivir/respawn forzado
