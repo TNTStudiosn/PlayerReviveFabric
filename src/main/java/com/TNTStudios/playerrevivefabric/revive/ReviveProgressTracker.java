@@ -64,7 +64,7 @@ public class ReviveProgressTracker {
         ServerPlayerEntity reviverPlayer = ServerUtil.getPlayer(reviver);
         if (reviverPlayer != null) {
             reviverPlayer.sendMessage(Text.literal("Revive cancelado: " + reason).formatted(Formatting.RED), false);
-            RevivePackets.sendCancelled(reviverPlayer, downed); // ✅ cliente limpiará su barra
+            RevivePackets.sendCancelled(reviverPlayer, downed);
         }
         PlayerReviveData.clearReviving(downed);
     }

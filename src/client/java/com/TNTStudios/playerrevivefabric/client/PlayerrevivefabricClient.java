@@ -3,14 +3,18 @@ package com.TNTStudios.playerrevivefabric.client;
 import com.TNTStudios.playerrevivefabric.client.gui.ReviveGui;
 import com.TNTStudios.playerrevivefabric.client.gui.ReviveProgressHud;
 import com.TNTStudios.playerrevivefabric.network.PlayerReviveNetwork;
-import com.TNTStudios.playerrevivefabric.network.RevivePackets;
 import com.TNTStudios.playerrevivefabric.revive.PlayerReviveData;
 import com.TNTStudios.playerrevivefabric.revive.ReviveConfig;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 
 import java.util.UUID;
 
@@ -57,13 +61,26 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.currentScreen == null && client.player != null) {
                 client.execute(() -> {
-                    // Lógica extra si es necesaria
                 });
             }
         });
 
         HudRenderCallback.EVENT.register((context, tickDelta) -> {
             ReviveProgressHud.render(context);
+        });
+
+        UseEntityCallback.EVENT.register((player, world, hand, entity, hitResult) -> {
+            if (!(entity instanceof PlayerEntity downed)) return ActionResult.PASS;
+
+            if (!PlayerReviveData.isDowned(downed.getUuid())) return ActionResult.PASS;
+
+            if (PlayerReviveData.isBeingRevived(downed.getUuid())) {
+                player.sendMessage(Text.literal("Este jugador ya está siendo levantado por alguien").formatted(Formatting.RED), true);
+                return ActionResult.FAIL;
+            }
+
+            RevivePacketsClient.sendStartRevive(downed.getUuid());
+            return ActionResult.SUCCESS;
         });
 
 

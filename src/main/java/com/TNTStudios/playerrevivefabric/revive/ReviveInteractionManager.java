@@ -23,8 +23,8 @@ public class ReviveInteractionManager {
         }
 
         PlayerReviveData.setBeingRevivedBy(downed, reviver.getUuid());
-        ReviveTimerManager.stopTimer(downed); // Detener muerte
-        ReviveProgressTracker tracker = new ReviveProgressTracker(downed, reviver, 100); // 5 segundos
+        ReviveTimerManager.stopTimer(downed);
+        ReviveProgressTracker tracker = new ReviveProgressTracker(downed, reviver, 100);
         activeRevives.put(downed, tracker);
     }
 
@@ -44,6 +44,6 @@ public class ReviveInteractionManager {
     }
 
     public static void tickAll() {
-        activeRevives.values().removeIf(ReviveProgressTracker::tick); // true si terminó
+        activeRevives.values().removeIf(ReviveProgressTracker::tick);
     }
 }

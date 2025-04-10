@@ -12,7 +12,7 @@ public class Playerrevivefabric implements ModInitializer {
         ReviveConfig.init();
         RevivePackets.registerServer();
 
-        ServerUtil.setServer(null); // opcional por seguridad
+        ServerUtil.setServer(null);
 
         net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             ServerUtil.setServer(server);
