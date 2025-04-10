@@ -1,5 +1,6 @@
 package com.TNTStudios.playerrevivefabric.revive;
 
+import com.TNTStudios.playerrevivefabric.network.PlayerReviveNetwork;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -41,9 +42,15 @@ public class ReviveTimerManager {
 
     private static void killPlayer(ServerPlayerEntity player) {
         DamageSource source = PlayerReviveData.getLastDamageSource(player);
-        PlayerReviveData.clear(player.getUuid()); // ✅ limpieza total
-        player.damage(source, Float.MAX_VALUE);   // ✅ muerte legítima
+
+        // Mandar "downed = false" a todos, para que el cliente cierre la GUI
+        PlayerReviveNetwork.sendDownedState(player, false);
+
+        PlayerReviveData.clear(player.getUuid());
+        // Golpe mortal con OUT_OF_WORLD
+        player.damage(player.getDamageSources().outOfWorld(), Float.MAX_VALUE);
     }
+
 
 
     public static int getRemainingTicks(UUID uuid) {

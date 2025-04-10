@@ -26,14 +26,14 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
 
                 PlayerReviveData.setDowned(affectedPlayerUuid, downed);
 
-                if (downed &&
-                        MinecraftClient.getInstance().player != null &&
-                        MinecraftClient.getInstance().player.getUuid().equals(affectedPlayerUuid)) {
-
-                    if (!(MinecraftClient.getInstance().currentScreen instanceof ReviveGui)) {
-                        int initialTicks = ReviveConfig.get().defaultReviveTicks;
-                        MinecraftClient.getInstance().setScreen(new ReviveGui(initialTicks));
+                if (!downed) {
+                    // Apagar downed local
+                    PlayerReviveData.setDowned(affectedPlayerUuid, false);
+                    // Cerrar GUI si estaba abierta
+                    if (MinecraftClient.getInstance().currentScreen instanceof ReviveGui) {
+                        MinecraftClient.getInstance().setScreen(null);
                     }
+                    return;
                 }
             });
         });

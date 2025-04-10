@@ -17,11 +17,13 @@ public abstract class ServerPlayerMixin {
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
 
-        // (1) Si ya está tumbado, cancela daño
-        if (PlayerReviveData.isDowned(player.getUuid())) {
+        if (PlayerReviveData.isDowned(player.getUuid()) &&
+                source != player.getDamageSources().outOfWorld()) {
             cir.setReturnValue(false);
             return;
         }
+
+
 
         // (2) Si el golpe mataría al jugador, evitar la muerte y marcarlo "downed"
         if (player.getHealth() - amount <= 0.0F) {
