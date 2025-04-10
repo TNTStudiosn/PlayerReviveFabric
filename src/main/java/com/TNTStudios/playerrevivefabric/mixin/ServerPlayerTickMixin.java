@@ -16,10 +16,11 @@ public abstract class ServerPlayerTickMixin {
     @Inject(method = "tick", at = @At("TAIL"))
     public void onTickTail(CallbackInfo ci) {
         ServerPlayerEntity player = (ServerPlayerEntity)(Object)this;
+        if (player.isDead() || player.getHealth() <= 0) return;
         ReviveTimerManager.tick(player);
         if (PlayerReviveData.isDowned(player.getUuid())) {
-            // Forzamos la pose "SWIMMING" al final del tick
             player.setPose(EntityPose.SWIMMING);
         }
+
     }
 }

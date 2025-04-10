@@ -15,7 +15,9 @@ public abstract class EntitySwimmingMixin {
     private void forceSwimmingStateServerAndClient(CallbackInfoReturnable<Boolean> cir) {
         Entity self = (Entity)(Object)this;
 
-        if (self instanceof PlayerEntity player && PlayerReviveData.isDowned(player.getUuid())) {
+        if (self instanceof PlayerEntity player &&
+                PlayerReviveData.isDowned(player.getUuid()) &&
+                !player.isDead() && player.getHealth() > 0) {
             cir.setReturnValue(true);
         }
     }
