@@ -1,6 +1,7 @@
 package com.TNTStudios.playerrevivefabric.revive;
 
 import com.TNTStudios.playerrevivefabric.network.PlayerReviveNetwork;
+import com.TNTStudios.playerrevivefabric.network.RevivePackets;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -19,8 +20,9 @@ public class ReviveTimerManager {
         timers.computeIfPresent(uuid, (id, ticksLeft) -> {
             if (ticksLeft <= 1) {
                 killPlayer(player);
-                return null; // eliminar de la lista
+                return null; // Eliminar de la lista
             }
+            RevivePackets.sendTimerUpdate(player, ticksLeft - 1); // Enviar actualización al cliente
             return ticksLeft - 1;
         });
     }
@@ -35,17 +37,11 @@ public class ReviveTimerManager {
 
     public static void forceDeath(ServerPlayerEntity player) {
         UUID uuid = player.getUuid();
-
         stopTimer(uuid);
-
-        // ✅ Limpieza antes de dañar
-        PlayerReviveData.clear(uuid);
-
-        // ✅ Notificar a todos que ya no está downed (GUI se cerrará)
-        PlayerReviveNetwork.sendDownedState(player, false);
-
-        // ✅ Ahora sí, aplicar daño mortal (ya no es considerado downed)
-        player.damage(player.getDamageSources().outOfWorld(), Float.MAX_VALUE);
+        PlayerReviveData.setDowned(uuid, false); // Marcar como no "down"
+        PlayerReviveData.markDeathAccepted(uuid); // Marcar muerte aceptada en el servidor
+        PlayerReviveNetwork.sendDownedState(player, false); // Notificar a todos
+        player.damage(player.getDamageSources().outOfWorld(), Float.MAX_VALUE); // Matar al jugador
     }
 
 

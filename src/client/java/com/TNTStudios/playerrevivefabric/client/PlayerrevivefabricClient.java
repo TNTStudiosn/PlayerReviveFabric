@@ -22,17 +22,21 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
             boolean downed = buf.readBoolean();
 
             client.execute(() -> {
-                if (PlayerReviveData.hasAcceptedDeath(affectedPlayerUuid)) return; // ❌ ya aceptó la muerte
+                if (PlayerReviveData.hasAcceptedDeath(affectedPlayerUuid)) return; // No hacer nada si ya aceptó la muerte
 
                 PlayerReviveData.setDowned(affectedPlayerUuid, downed);
 
-                if (!downed) {
-                    PlayerReviveData.setDowned(affectedPlayerUuid, false);
-                    PlayerReviveData.clear(affectedPlayerUuid); // <- ✅ importante, elimina marca de muerte aceptada
-                    if (MinecraftClient.getInstance().currentScreen instanceof ReviveGui) {
-                        MinecraftClient.getInstance().setScreen(null);
+                if (client.player != null && client.player.getUuid().equals(affectedPlayerUuid)) {
+                    if (downed) {
+                        // Abrir la GUI si el jugador local entra en estado "down"
+                        client.setScreen(new ReviveGui(ReviveConfig.get().defaultReviveTicks));
+                    } else {
+                        // Cerrar la GUI si el jugador local sale del estado "down"
+                        if (client.currentScreen instanceof ReviveGui) {
+                            client.setScreen(null);
+                        }
+                        PlayerReviveData.clear(affectedPlayerUuid); // Limpiar datos al salir del estado "down"
                     }
-                    return;
                 }
             });
         });
