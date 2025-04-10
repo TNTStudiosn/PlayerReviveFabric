@@ -1,6 +1,7 @@
 package com.TNTStudios.playerrevivefabric.mixin;
 
 import com.TNTStudios.playerrevivefabric.revive.PlayerReviveData;
+import com.TNTStudios.playerrevivefabric.revive.ReviveTimerManager;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,7 +16,7 @@ public abstract class ServerPlayerTickMixin {
     @Inject(method = "tick", at = @At("TAIL"))
     public void onTickTail(CallbackInfo ci) {
         ServerPlayerEntity player = (ServerPlayerEntity)(Object)this;
-
+        ReviveTimerManager.tick(player);
         if (PlayerReviveData.isDowned(player.getUuid())) {
             // Forzamos la pose "SWIMMING" al final del tick
             player.setPose(EntityPose.SWIMMING);

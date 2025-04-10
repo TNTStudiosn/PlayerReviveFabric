@@ -2,7 +2,7 @@ package com.TNTStudios.playerrevivefabric.mixin;
 
 import com.TNTStudios.playerrevivefabric.network.PlayerReviveNetwork;
 import com.TNTStudios.playerrevivefabric.revive.PlayerReviveData;
-import net.minecraft.entity.EntityPose;
+import com.TNTStudios.playerrevivefabric.revive.ReviveTimerManager;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,6 +27,7 @@ public abstract class ServerPlayerMixin {
         if (player.getHealth() - amount <= 0.0F) {
             PlayerReviveData.setDowned(player.getUuid(), true);
             PlayerReviveNetwork.sendDownedState(player, true); // Enviar al cliente
+            ReviveTimerManager.startTimer(player.getUuid());
             cir.setReturnValue(false); // no muere
         }
 
