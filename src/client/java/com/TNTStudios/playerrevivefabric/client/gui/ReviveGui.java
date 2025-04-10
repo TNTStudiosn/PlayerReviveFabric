@@ -68,6 +68,21 @@ public class ReviveGui extends Screen {
         super.render(context, mouseX, mouseY, delta);
     }
 
+    @Override
+    public boolean shouldCloseOnEsc() {
+        // Impedir que se cierre la GUI al presionar ESC
+        return false;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        // Bloquear la tecla ESC (código de tecla estándar en GLFW)
+        // Si usas GLFW, normalmente GLFW.GLFW_KEY_ESCAPE equivale a 256.
+        if (keyCode == 256) { // 256 es el código para la tecla ESC en GLFW
+            return false;
+        }
+        return super.keyPressed(keyCode, scanCode, modifiers);
+    }
 
     @Override
     public boolean shouldPause() {

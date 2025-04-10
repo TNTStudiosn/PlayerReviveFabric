@@ -28,8 +28,10 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
 
                 if (client.player != null && client.player.getUuid().equals(affectedPlayerUuid)) {
                     if (downed) {
-                        // Abrir la GUI si el jugador local entra en estado "down"
-                        client.setScreen(new ReviveGui(ReviveConfig.get().defaultReviveTicks));
+                        // Solo abrir la GUI si aún no está activa
+                        if (!(client.currentScreen instanceof ReviveGui)) {
+                            client.setScreen(new ReviveGui(ReviveConfig.get().defaultReviveTicks));
+                        }
                     } else {
                         // Cerrar la GUI si el jugador local sale del estado "down"
                         if (client.currentScreen instanceof ReviveGui) {
@@ -37,6 +39,7 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
                         }
                         PlayerReviveData.clear(affectedPlayerUuid); // Limpiar datos al salir del estado "down"
                     }
+
                 }
             });
         });
