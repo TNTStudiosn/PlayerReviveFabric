@@ -33,11 +33,11 @@ public class ReviveGui extends Screen {
         ButtonWidget button = ButtonWidget.builder(
                 Text.translatable("gui.revive.accept_death"),
                 btn -> {
-                    this.close();
                     if (this.client != null && this.client.player != null) {
-                        PlayerReviveData.setDowned(this.client.player.getUuid(), false);
+                        PlayerReviveData.setDowned(this.client.player.getUuid(), false); // Evitar reabrir GUI
+                        this.client.setScreen(null); // Cerrar GUI manualmente
+                        RevivePacketsClient.sendAcceptDeath(); // Notificar al servidor
                     }
-                    RevivePacketsClient.sendAcceptDeath();
                 }
         ).dimensions(centerX - 75, centerY + 20, 150, 20).build();
 
@@ -55,7 +55,6 @@ public class ReviveGui extends Screen {
                 .formatted(Formatting.RED);
 
         context.drawCenteredTextWithShadow(this.textRenderer, text, centerX, centerY - 20, 0xFFFFFF);
-
         super.render(context, mouseX, mouseY, delta);
     }
 

@@ -1,0 +1,5 @@
+{
+  "gui.revive.message": "You have %s seconds to be revived",
+  "gui.revive.accept_death": "Accept Death",
+  "gui.revive.title": "You are downed"
+}
