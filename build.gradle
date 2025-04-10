@@ -1,4 +1,4 @@
-plugins {
+yplugins {
     id 'fabric-loom' version '1.10-SNAPSHOT'
     id 'maven-publish'
 }
