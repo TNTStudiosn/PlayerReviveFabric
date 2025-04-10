@@ -34,10 +34,20 @@ public class ReviveTimerManager {
     }
 
     public static void forceDeath(ServerPlayerEntity player) {
-        stopTimer(player.getUuid());
-        PlayerReviveData.setDowned(player.getUuid(), false); // ✅ desmarcar
-        killPlayer(player);
+        UUID uuid = player.getUuid();
+
+        stopTimer(uuid);
+
+        // ✅ Limpieza antes de dañar
+        PlayerReviveData.clear(uuid);
+
+        // ✅ Notificar a todos que ya no está downed (GUI se cerrará)
+        PlayerReviveNetwork.sendDownedState(player, false);
+
+        // ✅ Ahora sí, aplicar daño mortal (ya no es considerado downed)
+        player.damage(player.getDamageSources().outOfWorld(), Float.MAX_VALUE);
     }
+
 
 
     private static void killPlayer(ServerPlayerEntity player) {

@@ -27,9 +27,8 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
                 PlayerReviveData.setDowned(affectedPlayerUuid, downed);
 
                 if (!downed) {
-                    // Apagar downed local
                     PlayerReviveData.setDowned(affectedPlayerUuid, false);
-                    // Cerrar GUI si estaba abierta
+                    PlayerReviveData.clear(affectedPlayerUuid); // <- ✅ importante, elimina marca de muerte aceptada
                     if (MinecraftClient.getInstance().currentScreen instanceof ReviveGui) {
                         MinecraftClient.getInstance().setScreen(null);
                     }
