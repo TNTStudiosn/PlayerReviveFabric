@@ -12,15 +12,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class SwimmingPoseMixin {
 
     @Inject(method = "isInSwimmingPose", at = @At("HEAD"), cancellable = true)
-    private void forceSwimmingPose(CallbackInfoReturnable<Boolean> cir) {
-        Entity self = (Entity) (Object) this;
+    private void forceSwimmingPoseServerAndClient(CallbackInfoReturnable<Boolean> cir) {
+        Entity self = (Entity)(Object)this;
 
-        if (self instanceof PlayerEntity player) {
-            // Solo forzar la pose de natación si el jugador está "downed"
-            if (PlayerReviveData.isDowned(player.getUuid()) && !player.isDead() && player.getHealth() > 0) {
-                cir.setReturnValue(true);
-            }
-            // Si no está "downed", no hacemos nada, dejando el comportamiento original
+        if (self instanceof PlayerEntity player &&
+                PlayerReviveData.isDowned(player.getUuid()) &&
+                !player.isDead() && player.getHealth() > 0) {
+            cir.setReturnValue(true);
         }
+
     }
 }
