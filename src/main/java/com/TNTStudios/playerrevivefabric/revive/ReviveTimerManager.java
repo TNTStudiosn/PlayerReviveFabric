@@ -38,12 +38,18 @@ public class ReviveTimerManager {
     public static void forceDeath(ServerPlayerEntity player) {
         UUID uuid = player.getUuid();
         stopTimer(uuid);
-        PlayerReviveData.setDowned(uuid, false); // Marcar como no "downed"
+        // Marcar como no "downed"
+        PlayerReviveData.setDowned(uuid, false);
         PlayerReviveNetwork.sendDownedState(player, false);
-        player.setHealth(20.0F); // Restaurar salud para evitar conflictos
+        // Agregar esta línea para limpiar la marca de muerte aceptada
+        PlayerReviveData.clear(uuid);
+
+        // Restaurar salud para evitar conflictos y forzar el daño letal
+        player.setHealth(20.0F);
         boolean damaged = player.damage(player.getDamageSources().outOfWorld(), Float.MAX_VALUE);
         System.out.println("Daño aplicado: " + damaged);
     }
+
 
     private static void killPlayer(ServerPlayerEntity player) {
         PlayerReviveData.setDowned(player.getUuid(), false); // Marcar como no "downed"
