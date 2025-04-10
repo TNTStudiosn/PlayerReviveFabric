@@ -12,15 +12,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerTickMixin {
 
-    // Inyectamos al final del tick (TAIL) para que no nos sobreescriba la pose
     @Inject(method = "tick", at = @At("TAIL"))
     public void onTickTail(CallbackInfo ci) {
-        ServerPlayerEntity player = (ServerPlayerEntity)(Object)this;
+        ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         if (player.isDead() || player.getHealth() <= 0) return;
-        ReviveTimerManager.tick(player);
+
+        // Solo ejecutar lógica si el jugador está "downed"
         if (PlayerReviveData.isDowned(player.getUuid())) {
+            ReviveTimerManager.tick(player);
             player.setPose(EntityPose.SWIMMING);
         }
-
+        // Si no está "downed", no hacemos nada
     }
 }
