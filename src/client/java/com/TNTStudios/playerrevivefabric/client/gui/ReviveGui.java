@@ -19,6 +19,10 @@ public class ReviveGui extends Screen {
         remainingTicks = ticks;
     }
 
+    private int getSecondsRemaining() {
+        return Math.max(remainingTicks / 20, 0); // evita negativos
+    }
+
     @Override
     protected void init() {
         int centerX = this.width / 2;
@@ -42,8 +46,8 @@ public class ReviveGui extends Screen {
         int centerX = this.width / 2;
         int centerY = this.height / 2;
 
-        String seconds = String.valueOf(remainingTicks / 20); // ticks → s
-        Text text = Text.translatable("gui.revive.message", seconds).formatted(Formatting.RED);
+        Text text = Text.translatable("gui.revive.message", String.valueOf(getSecondsRemaining()))
+                .formatted(Formatting.RED);
 
         context.drawCenteredTextWithShadow(this.textRenderer, text, centerX, centerY - 20, 0xFFFFFF);
 

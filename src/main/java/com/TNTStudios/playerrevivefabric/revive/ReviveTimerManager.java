@@ -1,5 +1,6 @@
 package com.TNTStudios.playerrevivefabric.revive;
 
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
 import java.util.Map;
@@ -33,12 +34,17 @@ public class ReviveTimerManager {
 
     public static void forceDeath(ServerPlayerEntity player) {
         stopTimer(player.getUuid());
+        PlayerReviveData.setDowned(player.getUuid(), false); // ✅ desmarcar
         killPlayer(player);
     }
 
+
     private static void killPlayer(ServerPlayerEntity player) {
-        player.setHealth(0.0F); // fuerza muerte
+        DamageSource source = PlayerReviveData.getLastDamageSource(player);
+        PlayerReviveData.clear(player.getUuid()); // ✅ limpieza total
+        player.damage(source, Float.MAX_VALUE);   // ✅ muerte legítima
     }
+
 
     public static int getRemainingTicks(UUID uuid) {
         return timers.getOrDefault(uuid, 0);

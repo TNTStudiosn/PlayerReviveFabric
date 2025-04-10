@@ -26,10 +26,12 @@ public abstract class ServerPlayerMixin {
         // (2) Si el golpe mataría al jugador, evitar la muerte y marcarlo "downed"
         if (player.getHealth() - amount <= 0.0F) {
             PlayerReviveData.setDowned(player.getUuid(), true);
-            PlayerReviveNetwork.sendDownedState(player, true); // Enviar al cliente
+            PlayerReviveData.setLastDamageSource(player.getUuid(), source); // ✅ guardar fuente
+            PlayerReviveNetwork.sendDownedState(player, true);
             ReviveTimerManager.startTimer(player.getUuid());
-            cir.setReturnValue(false); // no muere
+            cir.setReturnValue(false);
         }
+
 
     }
 }
