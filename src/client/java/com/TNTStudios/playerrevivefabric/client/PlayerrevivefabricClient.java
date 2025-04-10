@@ -1,5 +1,6 @@
 package com.TNTStudios.playerrevivefabric.client;
 
+import com.TNTStudios.playerrevivefabric.client.gui.ReviveGui;
 import com.TNTStudios.playerrevivefabric.network.PlayerReviveNetwork;
 import com.TNTStudios.playerrevivefabric.revive.PlayerReviveData;
 import net.fabricmc.api.ClientModInitializer;
@@ -11,6 +12,7 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        RevivePacketsClient.registerClient();
         // Registrar receptor para el paquete "set_downed"
         ClientPlayNetworking.registerGlobalReceiver(PlayerReviveNetwork.SET_DOWNED_PACKET, (client, handler, buf, responseSender) -> {
             // Leer el UUID del jugador afectado desde el paquete
@@ -22,5 +24,21 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
                 PlayerReviveData.setDowned(affectedPlayerUuid, downed);
             });
         });
+
+        ReviveClientHooks.registerCallbacks(new ReviveClientHooks.ReviveClientCallbacks() {
+            @Override
+            public void updateReviveTimer(int ticks) {
+                if (MinecraftClient.getInstance().player != null) {
+                    UUID uuid = MinecraftClient.getInstance().player.getUuid();
+                    if (PlayerReviveData.isDowned(uuid)) {
+                        ReviveGui.setRemainingTicks(ticks);
+                        if (!(MinecraftClient.getInstance().currentScreen instanceof ReviveGui)) {
+                            MinecraftClient.getInstance().setScreen(new ReviveGui());
+                        }
+                    }
+                }
+            }
+        });
     }
 }
+

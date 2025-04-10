@@ -1,5 +1,8 @@
 package com.TNTStudios.playerrevivefabric.client;
 
+import com.TNTStudios.playerrevivefabric.client.gui.ReviveGui;
+import net.minecraft.client.MinecraftClient;
+
 public class ReviveClientHooks {
 
     private static ReviveClientCallbacks callbacks;
