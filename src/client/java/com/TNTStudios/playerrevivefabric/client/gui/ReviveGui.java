@@ -8,6 +8,8 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
+import java.util.UUID;
+
 public class ReviveGui extends Screen {
 
     private int remainingTicks;
@@ -34,11 +36,14 @@ public class ReviveGui extends Screen {
                 Text.translatable("gui.revive.accept_death"),
                 btn -> {
                     if (this.client != null && this.client.player != null) {
-                        PlayerReviveData.setDowned(this.client.player.getUuid(), false);
-                        this.client.setScreen(null); // Cierra la pantalla
+                        UUID uuid = this.client.player.getUuid();
+                        PlayerReviveData.setDowned(uuid, false);
+                        PlayerReviveData.markDeathAccepted(uuid); // ✅ nueva marca
+                        this.client.setScreen(null);
                         RevivePacketsClient.sendAcceptDeath();
                     }
                 }
+
         ).dimensions(centerX - 75, centerY + 20, 150, 20).build();
 
         this.addDrawableChild(button);

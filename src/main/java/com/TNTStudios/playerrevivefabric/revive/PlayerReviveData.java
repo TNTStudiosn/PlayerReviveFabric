@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PlayerReviveData {
     private static final Set<UUID> downedPlayers = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, DamageSource> lastDamageSource = new ConcurrentHashMap<>();
+    private static final Set<UUID> hasAcceptedDeath = ConcurrentHashMap.newKeySet();
 
     public static boolean isDowned(UUID playerId) {
         return downedPlayers.contains(playerId);
@@ -32,8 +33,17 @@ public class PlayerReviveData {
         return lastDamageSource.getOrDefault(player.getUuid(), player.getDamageSources().generic());
     }
 
+    public static void markDeathAccepted(UUID uuid) {
+        hasAcceptedDeath.add(uuid);
+    }
+
+    public static boolean hasAcceptedDeath(UUID uuid) {
+        return hasAcceptedDeath.contains(uuid);
+    }
+
     public static void clear(UUID uuid) {
         downedPlayers.remove(uuid);
         lastDamageSource.remove(uuid);
+        hasAcceptedDeath.remove(uuid);
     }
 }

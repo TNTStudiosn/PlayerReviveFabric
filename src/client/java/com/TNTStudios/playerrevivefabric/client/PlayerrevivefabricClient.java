@@ -22,9 +22,10 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
             boolean downed = buf.readBoolean();
 
             client.execute(() -> {
+                if (PlayerReviveData.hasAcceptedDeath(affectedPlayerUuid)) return; // ❌ ya aceptó la muerte
+
                 PlayerReviveData.setDowned(affectedPlayerUuid, downed);
 
-                // Si el jugador es el cliente y está downed, mostrar GUI (si aún no está abierta)
                 if (downed &&
                         MinecraftClient.getInstance().player != null &&
                         MinecraftClient.getInstance().player.getUuid().equals(affectedPlayerUuid)) {
