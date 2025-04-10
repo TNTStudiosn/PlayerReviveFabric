@@ -1,5 +1,6 @@
 package com.TNTStudios.playerrevivefabric.client;
 
+import com.TNTStudios.playerrevivefabric.client.gui.ReviveGui;
 import com.TNTStudios.playerrevivefabric.network.RevivePackets;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;

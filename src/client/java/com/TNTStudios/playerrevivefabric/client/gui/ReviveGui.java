@@ -1,6 +1,7 @@
 package com.TNTStudios.playerrevivefabric.client.gui;
 
 import com.TNTStudios.playerrevivefabric.client.RevivePacketsClient;
+import com.TNTStudios.playerrevivefabric.revive.PlayerReviveData;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -9,18 +10,19 @@ import net.minecraft.util.Formatting;
 
 public class ReviveGui extends Screen {
 
-    private static int remainingTicks = 0;
+    private int remainingTicks;
 
-    public ReviveGui() {
+    public ReviveGui(int initialTicks) {
         super(Text.translatable("gui.revive.title"));
+        this.remainingTicks = initialTicks;
     }
 
-    public static void setRemainingTicks(int ticks) {
-        remainingTicks = ticks;
+    public void updateTicks(int ticks) {
+        this.remainingTicks = ticks;
     }
 
     private int getSecondsRemaining() {
-        return Math.max(remainingTicks / 20, 0); // evita negativos
+        return Math.max(remainingTicks / 20, 0);
     }
 
     @Override
@@ -31,8 +33,11 @@ public class ReviveGui extends Screen {
         ButtonWidget button = ButtonWidget.builder(
                 Text.translatable("gui.revive.accept_death"),
                 btn -> {
-                    RevivePacketsClient.sendAcceptDeath();
                     this.close();
+                    if (this.client != null && this.client.player != null) {
+                        PlayerReviveData.setDowned(this.client.player.getUuid(), false);
+                    }
+                    RevivePacketsClient.sendAcceptDeath();
                 }
         ).dimensions(centerX - 75, centerY + 20, 150, 20).build();
 
