@@ -12,6 +12,7 @@ public class PlayerReviveData {
     private static final Set<UUID> downedPlayers = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, DamageSource> lastDamageSource = new ConcurrentHashMap<>();
     private static final Set<UUID> hasAcceptedDeath = ConcurrentHashMap.newKeySet();
+    private static final Map<UUID, UUID> beingRevivedBy = new ConcurrentHashMap<>();
 
     public static boolean isDowned(UUID playerId) {
         return downedPlayers.contains(playerId);
@@ -39,6 +40,22 @@ public class PlayerReviveData {
 
     public static boolean hasAcceptedDeath(UUID uuid) {
         return hasAcceptedDeath.contains(uuid);
+    }
+
+    public static void setBeingRevivedBy(UUID downed, UUID reviver) {
+        beingRevivedBy.put(downed, reviver);
+    }
+
+    public static UUID getReviver(UUID downed) {
+        return beingRevivedBy.get(downed);
+    }
+
+    public static boolean isBeingRevived(UUID downed) {
+        return beingRevivedBy.containsKey(downed);
+    }
+
+    public static void clearReviving(UUID downed) {
+        beingRevivedBy.remove(downed);
     }
 
     public static void clear(UUID uuid) {

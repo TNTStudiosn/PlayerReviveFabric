@@ -1,11 +1,15 @@
 package com.TNTStudios.playerrevivefabric.client;
 
 import com.TNTStudios.playerrevivefabric.client.gui.ReviveGui;
+import com.TNTStudios.playerrevivefabric.client.gui.ReviveProgressHud;
 import com.TNTStudios.playerrevivefabric.network.PlayerReviveNetwork;
+import com.TNTStudios.playerrevivefabric.network.RevivePackets;
 import com.TNTStudios.playerrevivefabric.revive.PlayerReviveData;
 import com.TNTStudios.playerrevivefabric.revive.ReviveConfig;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.UUID;
@@ -49,5 +53,19 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
                 }
             }
         });
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.currentScreen == null && client.player != null) {
+                client.execute(() -> {
+                    // Lógica extra si es necesaria
+                });
+            }
+        });
+
+        HudRenderCallback.EVENT.register((context, tickDelta) -> {
+            ReviveProgressHud.render(context);
+        });
+
+
     }
 }

@@ -67,6 +67,7 @@ public class ReviveTimerManager {
         player.setHealth(20.0F);
         boolean damaged = player.damage(player.getDamageSources().outOfWorld(), Float.MAX_VALUE);
         System.out.println("Daño aplicado: " + damaged);
+        ReviveInteractionManager.cancelIfBeingRevived(uuid);
     }
 
     public static int getRemainingTicks(UUID uuid) {

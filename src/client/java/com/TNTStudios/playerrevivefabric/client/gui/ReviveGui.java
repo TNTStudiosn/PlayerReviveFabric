@@ -58,8 +58,13 @@ public class ReviveGui extends Screen {
 
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, centerX, centerY - 50, 0xFFFFFF);
 
-        Text text = Text.translatable("gui.revive.message", String.valueOf(getSecondsRemaining()))
-                .formatted(Formatting.RED);
+        Text text;
+        if (PlayerReviveData.isBeingRevived(this.client.player.getUuid())) {
+            text = Text.literal("Estás siendo levantado").formatted(Formatting.GREEN);
+        } else {
+            text = Text.translatable("gui.revive.message", String.valueOf(getSecondsRemaining()))
+                    .formatted(Formatting.RED);
+        }
 
         context.drawCenteredTextWithShadow(this.textRenderer, text, centerX, centerY - 20, 0xFFFFFF);
 
