@@ -11,7 +11,6 @@ public class RevivePackets {
     public static final Identifier REVIVE_TIMER_SYNC = new Identifier("playerrevivefabric", "revive_timer_sync");
     public static final Identifier ACCEPT_DEATH = new Identifier("playerrevivefabric", "accept_death");
 
-    // Servidor: registro del receptor
     public static void registerServer() {
         ServerPlayNetworking.registerGlobalReceiver(ACCEPT_DEATH, (server, player, handler, buf, responseSender) -> {
             server.execute(() -> {
@@ -20,7 +19,6 @@ public class RevivePackets {
         });
     }
 
-    // Servidor → Cliente
     public static void sendTimerUpdate(ServerPlayerEntity player, int ticks) {
         PacketByteBuf buf = new PacketByteBuf(io.netty.buffer.Unpooled.buffer());
         buf.writeUuid(player.getUuid());

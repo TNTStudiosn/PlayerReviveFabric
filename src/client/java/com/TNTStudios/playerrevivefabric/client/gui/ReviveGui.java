@@ -38,7 +38,7 @@ public class ReviveGui extends Screen {
                     if (this.client != null && this.client.player != null) {
                         UUID uuid = this.client.player.getUuid();
                         PlayerReviveData.setDowned(uuid, false);
-                        PlayerReviveData.markDeathAccepted(uuid); // ✅ nueva marca
+                        PlayerReviveData.markDeathAccepted(uuid);
                         this.client.setScreen(null);
                         RevivePacketsClient.sendAcceptDeath();
                     }
@@ -56,10 +56,8 @@ public class ReviveGui extends Screen {
         int centerX = this.width / 2;
         int centerY = this.height / 2;
 
-        // ✅ Dibuja el título en la parte superior
         context.drawCenteredTextWithShadow(this.textRenderer, this.title, centerX, centerY - 50, 0xFFFFFF);
 
-        // ✅ Dibuja el mensaje con el contador
         Text text = Text.translatable("gui.revive.message", String.valueOf(getSecondsRemaining()))
                 .formatted(Formatting.RED);
 
@@ -70,15 +68,12 @@ public class ReviveGui extends Screen {
 
     @Override
     public boolean shouldCloseOnEsc() {
-        // Impedir que se cierre la GUI al presionar ESC
         return false;
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        // Bloquear la tecla ESC (código de tecla estándar en GLFW)
-        // Si usas GLFW, normalmente GLFW.GLFW_KEY_ESCAPE equivale a 256.
-        if (keyCode == 256) { // 256 es el código para la tecla ESC en GLFW
+        if (keyCode == 256) {
             return false;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);

@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerTickMixin {
 
-    // Inyectamos al final del tick (TAIL) para que no nos sobreescriba la pose
     @Inject(method = "tick", at = @At("TAIL"))
     public void onTickTail(CallbackInfo ci) {
         ServerPlayerEntity player = (ServerPlayerEntity)(Object)this;
