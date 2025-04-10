@@ -34,9 +34,9 @@ public class ReviveGui extends Screen {
                 Text.translatable("gui.revive.accept_death"),
                 btn -> {
                     if (this.client != null && this.client.player != null) {
-                        PlayerReviveData.setDowned(this.client.player.getUuid(), false); // Evitar reabrir GUI
-                        this.client.setScreen(null); // Cerrar GUI manualmente
-                        RevivePacketsClient.sendAcceptDeath(); // Notificar al servidor
+                        PlayerReviveData.setDowned(this.client.player.getUuid(), false);
+                        this.client.setScreen(null); // Cierra la pantalla
+                        RevivePacketsClient.sendAcceptDeath();
                     }
                 }
         ).dimensions(centerX - 75, centerY + 20, 150, 20).build();
@@ -51,12 +51,18 @@ public class ReviveGui extends Screen {
         int centerX = this.width / 2;
         int centerY = this.height / 2;
 
+        // ✅ Dibuja el título en la parte superior
+        context.drawCenteredTextWithShadow(this.textRenderer, this.title, centerX, centerY - 50, 0xFFFFFF);
+
+        // ✅ Dibuja el mensaje con el contador
         Text text = Text.translatable("gui.revive.message", String.valueOf(getSecondsRemaining()))
                 .formatted(Formatting.RED);
 
         context.drawCenteredTextWithShadow(this.textRenderer, text, centerX, centerY - 20, 0xFFFFFF);
+
         super.render(context, mouseX, mouseY, delta);
     }
+
 
     @Override
     public boolean shouldPause() {
