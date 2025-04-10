@@ -1,2 +1,4 @@
 Copyright (c) 2025 TNTStudios
 All rights reserved.
+
+-si se esta en modo creativo no funciona, ni en espectadoor, la solucion es que si se esta en estos modos los cambia a survival

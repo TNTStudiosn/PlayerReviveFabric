@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ReviveTimerManager {
 
     private static final Map<UUID, Integer> timers = new ConcurrentHashMap<>();
+    private static final Map<UUID, Integer> lastSentSeconds = new ConcurrentHashMap<>();
 
     public static void tick(ServerPlayerEntity player) {
         UUID uuid = player.getUuid();
@@ -20,47 +21,53 @@ public class ReviveTimerManager {
         timers.computeIfPresent(uuid, (id, ticksLeft) -> {
             if (ticksLeft <= 1) {
                 killPlayer(player);
-                return null; // Eliminar de la lista
+                lastSentSeconds.remove(uuid);
+                return null;
             }
-            RevivePackets.sendTimerUpdate(player, ticksLeft - 1); // Enviar actualización al cliente
-            return ticksLeft - 1;
+
+            int newTicksLeft = ticksLeft - 1;
+            int newSeconds = newTicksLeft / 20;
+            int lastSeconds = lastSentSeconds.getOrDefault(uuid, -1);
+
+            if (newSeconds != lastSeconds) {
+                RevivePackets.sendTimerUpdate(player, newTicksLeft);
+                lastSentSeconds.put(uuid, newSeconds);
+            }
+            return newTicksLeft;
         });
     }
 
     public static void startTimer(UUID uuid) {
         timers.put(uuid, ReviveConfig.get().defaultReviveTicks);
+        lastSentSeconds.put(uuid, ReviveConfig.get().defaultReviveTicks / 20);
     }
 
     public static void stopTimer(UUID uuid) {
         timers.remove(uuid);
+        lastSentSeconds.remove(uuid);
     }
 
     public static void forceDeath(ServerPlayerEntity player) {
         UUID uuid = player.getUuid();
         stopTimer(uuid);
-        // Marcar como no "downed"
         PlayerReviveData.setDowned(uuid, false);
         PlayerReviveNetwork.sendDownedState(player, false);
-        // Agregar esta línea para limpiar la marca de muerte aceptada
         PlayerReviveData.clear(uuid);
 
-        // Restaurar salud para evitar conflictos y forzar el daño letal
         player.setHealth(20.0F);
         boolean damaged = player.damage(player.getDamageSources().outOfWorld(), Float.MAX_VALUE);
         System.out.println("Daño aplicado: " + damaged);
     }
 
-
     private static void killPlayer(ServerPlayerEntity player) {
-        PlayerReviveData.setDowned(player.getUuid(), false); // Marcar como no "downed"
+        UUID uuid = player.getUuid();
+        PlayerReviveData.setDowned(uuid, false);
         PlayerReviveNetwork.sendDownedState(player, false);
-        PlayerReviveData.clear(player.getUuid());
-        player.setHealth(20.0F); // Restaurar salud
+        PlayerReviveData.clear(uuid);
+        player.setHealth(20.0F);
         boolean damaged = player.damage(player.getDamageSources().outOfWorld(), Float.MAX_VALUE);
         System.out.println("Daño aplicado: " + damaged);
     }
-
-
 
     public static int getRemainingTicks(UUID uuid) {
         return timers.getOrDefault(uuid, 0);
