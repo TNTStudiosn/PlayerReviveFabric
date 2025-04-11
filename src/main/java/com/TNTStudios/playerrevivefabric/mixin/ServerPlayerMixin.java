@@ -5,6 +5,8 @@ import com.TNTStudios.playerrevivefabric.revive.PlayerReviveData;
 import com.TNTStudios.playerrevivefabric.revive.ReviveTimerManager;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -35,6 +37,14 @@ public abstract class ServerPlayerMixin {
             PlayerReviveData.setLastDamageSource(player.getUuid(), source);
             PlayerReviveNetwork.sendDownedState(player, true);
             ReviveTimerManager.startTimer(player.getUuid());
+
+            // Enviar mensaje a todo el servidor
+            String playerName = player.getName().getString();
+            Text message = Text.literal("[" + playerName + "] está tirado en el suelo D:").formatted(Formatting.RED);
+            if (player.getServer() != null) {
+                player.getServer().getPlayerManager().broadcast(message, false);
+            }
+
             cir.setReturnValue(false);
         }
     }

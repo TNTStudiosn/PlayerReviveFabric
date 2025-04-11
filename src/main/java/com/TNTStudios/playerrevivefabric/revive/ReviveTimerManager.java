@@ -4,6 +4,7 @@ import com.TNTStudios.playerrevivefabric.network.PlayerReviveNetwork;
 import com.TNTStudios.playerrevivefabric.network.RevivePackets;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 
 import java.util.Map;
 import java.util.UUID;
@@ -51,32 +52,53 @@ public class ReviveTimerManager {
         UUID uuid = player.getUuid();
         stopTimer(uuid);
         PlayerReviveData.setDowned(uuid, false);
+        PlayerReviveData.markDeathAccepted(uuid); // Marcar muerte aceptada antes del daño
         PlayerReviveNetwork.sendDownedState(player, false);
 
-        // Aplicar el daño original
         DamageSource source = PlayerReviveData.getLastDamageSource(player);
-        player.setHealth(player.getMaxHealth()); // Asegurar que el daño sea letal
-        player.damage(source, Float.MAX_VALUE);
+        if (player.getServer() != null) {
+            player.getServer().execute(() -> {
+                player.setHealth(player.getMaxHealth()); // Restaurar vida
+                player.damage(source, Float.MAX_VALUE);  // Intentar matar con daño
 
-        PlayerReviveData.clear(uuid);
+                // Si sigue vivo, forzar la muerte estableciendo salud a 0
+                if (player.isAlive()) {
+                    player.setHealth(0.0F); // Método más confiable para forzar muerte
+                    player.getServer().getPlayerManager().broadcast(
+                            Text.literal(player.getName().getString() + " murió por " + source.getName()),
+                            false
+                    );
+                }
+                PlayerReviveData.clear(uuid);
+            });
+        }
     }
 
     private static void killPlayer(ServerPlayerEntity player) {
         UUID uuid = player.getUuid();
         stopTimer(uuid);
         PlayerReviveData.setDowned(uuid, false);
+        PlayerReviveData.markTimerExpired(uuid); // Marcar temporizador expirado antes del daño
         PlayerReviveNetwork.sendDownedState(player, false);
 
-        // Marcar que el temporizador expiró
-        PlayerReviveData.markTimerExpired(uuid);
-
-        // Aplicar el daño original
         DamageSource source = PlayerReviveData.getLastDamageSource(player);
-        player.setHealth(player.getMaxHealth()); // Asegurar que el daño sea letal
-        player.damage(source, Float.MAX_VALUE);
+        if (player.getServer() != null) {
+            player.getServer().execute(() -> {
+                player.setHealth(player.getMaxHealth()); // Restaurar vida
+                player.damage(source, Float.MAX_VALUE);  // Intentar matar con daño
 
-        PlayerReviveData.clear(uuid);
-        ReviveInteractionManager.cancelIfBeingRevived(uuid);
+                // Si sigue vivo, forzar la muerte estableciendo salud a 0
+                if (player.isAlive()) {
+                    player.setHealth(0.0F); // Método más confiable para forzar muerte
+                    player.getServer().getPlayerManager().broadcast(
+                            Text.literal(player.getName().getString() + " murió por " + source.getName()),
+                            false
+                    );
+                }
+                PlayerReviveData.clear(uuid);
+                ReviveInteractionManager.cancelIfBeingRevived(uuid);
+            });
+        }
     }
 
     public static int getRemainingTicks(UUID uuid) {
