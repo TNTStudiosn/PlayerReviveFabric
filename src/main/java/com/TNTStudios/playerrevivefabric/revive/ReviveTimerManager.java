@@ -52,21 +52,30 @@ public class ReviveTimerManager {
         stopTimer(uuid);
         PlayerReviveData.setDowned(uuid, false);
         PlayerReviveNetwork.sendDownedState(player, false);
-        PlayerReviveData.clear(uuid);
 
-        player.setHealth(20.0F);
-        boolean damaged = player.damage(player.getDamageSources().outOfWorld(), Float.MAX_VALUE);
-        System.out.println("Daño aplicado: " + damaged);
+        // Aplicar el daño original
+        DamageSource source = PlayerReviveData.getLastDamageSource(player);
+        player.setHealth(player.getMaxHealth()); // Asegurar que el daño sea letal
+        player.damage(source, Float.MAX_VALUE);
+
+        PlayerReviveData.clear(uuid);
     }
 
     private static void killPlayer(ServerPlayerEntity player) {
         UUID uuid = player.getUuid();
+        stopTimer(uuid);
         PlayerReviveData.setDowned(uuid, false);
         PlayerReviveNetwork.sendDownedState(player, false);
+
+        // Marcar que el temporizador expiró
+        PlayerReviveData.markTimerExpired(uuid);
+
+        // Aplicar el daño original
+        DamageSource source = PlayerReviveData.getLastDamageSource(player);
+        player.setHealth(player.getMaxHealth()); // Asegurar que el daño sea letal
+        player.damage(source, Float.MAX_VALUE);
+
         PlayerReviveData.clear(uuid);
-        player.setHealth(20.0F);
-        boolean damaged = player.damage(player.getDamageSources().outOfWorld(), Float.MAX_VALUE);
-        System.out.println("Daño aplicado: " + damaged);
         ReviveInteractionManager.cancelIfBeingRevived(uuid);
     }
 

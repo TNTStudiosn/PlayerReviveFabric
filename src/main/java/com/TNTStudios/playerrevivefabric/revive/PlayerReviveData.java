@@ -12,6 +12,7 @@ public class PlayerReviveData {
     private static final Set<UUID> downedPlayers = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, DamageSource> lastDamageSource = new ConcurrentHashMap<>();
     private static final Set<UUID> hasAcceptedDeath = ConcurrentHashMap.newKeySet();
+    private static final Set<UUID> hasTimerExpired = ConcurrentHashMap.newKeySet();
     private static final Map<UUID, UUID> beingRevivedBy = new ConcurrentHashMap<>();
 
     public static boolean isDowned(UUID playerId) {
@@ -31,7 +32,7 @@ public class PlayerReviveData {
     }
 
     public static DamageSource getLastDamageSource(ServerPlayerEntity player) {
-        return lastDamageSource.getOrDefault(player.getUuid(), player.getDamageSources().generic());
+        return lastDamageSource.getOrDefault(player.getUuid(), player.getDamageSources().genericKill());
     }
 
     public static void markDeathAccepted(UUID uuid) {
@@ -40,6 +41,14 @@ public class PlayerReviveData {
 
     public static boolean hasAcceptedDeath(UUID uuid) {
         return hasAcceptedDeath.contains(uuid);
+    }
+
+    public static void markTimerExpired(UUID uuid) {
+        hasTimerExpired.add(uuid);
+    }
+
+    public static boolean hasTimerExpired(UUID uuid) {
+        return hasTimerExpired.contains(uuid);
     }
 
     public static void setBeingRevivedBy(UUID downed, UUID reviver) {
@@ -62,5 +71,6 @@ public class PlayerReviveData {
         downedPlayers.remove(uuid);
         lastDamageSource.remove(uuid);
         hasAcceptedDeath.remove(uuid);
+        hasTimerExpired.remove(uuid);
     }
 }
