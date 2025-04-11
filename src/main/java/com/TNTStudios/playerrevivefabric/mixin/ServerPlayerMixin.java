@@ -17,16 +17,16 @@ public abstract class ServerPlayerMixin {
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
 
-        if (PlayerReviveData.isDowned(player.getUuid()) &&
-                source != player.getDamageSources().outOfWorld()) {
+        // Si el jugador ya está marcado como "downed", se cancela el daño
+        if (PlayerReviveData.isDowned(player.getUuid())) {
             cir.setReturnValue(false);
             return;
         }
 
+        // Si el daño es letal, se activa el estado "downed" y se inicia el temporizador de revivificación.
         if (player.getHealth() - amount <= 0.0F) {
-            if (source == player.getDamageSources().outOfWorld()) {
-                return;
-            }
+            // Se elimina la condición que ignoraba el daño outOfWorld,
+            // permitiendo que este tipo de daño también active la mecánica de revivir.
             PlayerReviveData.setDowned(player.getUuid(), true);
             PlayerReviveData.setLastDamageSource(player.getUuid(), source);
             PlayerReviveNetwork.sendDownedState(player, true);
@@ -35,4 +35,3 @@ public abstract class ServerPlayerMixin {
         }
     }
 }
-
