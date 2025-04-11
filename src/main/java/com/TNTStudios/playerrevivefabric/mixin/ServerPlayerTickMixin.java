@@ -1,7 +1,6 @@
 package com.TNTStudios.playerrevivefabric.mixin;
 
 import com.TNTStudios.playerrevivefabric.revive.PlayerReviveData;
-import com.TNTStudios.playerrevivefabric.revive.ReviveInteractionManager;
 import com.TNTStudios.playerrevivefabric.revive.ReviveTimerManager;
 import net.minecraft.entity.EntityPose;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -21,9 +20,8 @@ public abstract class ServerPlayerTickMixin {
         if (PlayerReviveData.isDowned(player.getUuid())) {
             player.setPose(EntityPose.SWIMMING);
         }
-        if (player.getServer() != null && player.getServer().getTicks() % 2 == 0) {
-            ReviveInteractionManager.tickAll();
-        }
-
+        // Eliminado: if (player.getServer() != null && player.getServer().getTicks() % 2 == 0) {
+        //     ReviveInteractionManager.tickAll();
+        // }
     }
 }

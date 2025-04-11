@@ -52,24 +52,25 @@ public class ReviveTimerManager {
         UUID uuid = player.getUuid();
         stopTimer(uuid);
         PlayerReviveData.setDowned(uuid, false);
-        PlayerReviveData.markDeathAccepted(uuid); // Marcar muerte aceptada antes del daño
+        PlayerReviveData.markDeathAccepted(uuid);
         PlayerReviveNetwork.sendDownedState(player, false);
 
         DamageSource source = PlayerReviveData.getLastDamageSource(player);
         if (player.getServer() != null) {
             player.getServer().execute(() -> {
-                player.setHealth(player.getMaxHealth()); // Restaurar vida
-                player.damage(source, Float.MAX_VALUE);  // Intentar matar con daño
+                player.setHealth(player.getMaxHealth());
+                player.damage(source, Float.MAX_VALUE);
 
-                // Si sigue vivo, forzar la muerte estableciendo salud a 0
                 if (player.isAlive()) {
-                    player.setHealth(0.0F); // Método más confiable para forzar muerte
+                    player.setHealth(0.0F);
                     player.getServer().getPlayerManager().broadcast(
                             Text.literal(player.getName().getString() + " murió por " + source.getName()),
                             false
                     );
                 }
+                // Limpiar estados y forzar sincronización
                 PlayerReviveData.clear(uuid);
+                PlayerReviveNetwork.sendDownedState(player, false); // Enviar estado nuevamente tras muerte
             });
         }
     }
@@ -78,24 +79,25 @@ public class ReviveTimerManager {
         UUID uuid = player.getUuid();
         stopTimer(uuid);
         PlayerReviveData.setDowned(uuid, false);
-        PlayerReviveData.markTimerExpired(uuid); // Marcar temporizador expirado antes del daño
+        PlayerReviveData.markTimerExpired(uuid);
         PlayerReviveNetwork.sendDownedState(player, false);
 
         DamageSource source = PlayerReviveData.getLastDamageSource(player);
         if (player.getServer() != null) {
             player.getServer().execute(() -> {
-                player.setHealth(player.getMaxHealth()); // Restaurar vida
-                player.damage(source, Float.MAX_VALUE);  // Intentar matar con daño
+                player.setHealth(player.getMaxHealth());
+                player.damage(source, Float.MAX_VALUE);
 
-                // Si sigue vivo, forzar la muerte estableciendo salud a 0
                 if (player.isAlive()) {
-                    player.setHealth(0.0F); // Método más confiable para forzar muerte
+                    player.setHealth(0.0F);
                     player.getServer().getPlayerManager().broadcast(
                             Text.literal(player.getName().getString() + " murió por " + source.getName()),
                             false
                     );
                 }
+                // Limpiar estados y forzar sincronización
                 PlayerReviveData.clear(uuid);
+                PlayerReviveNetwork.sendDownedState(player, false); // Enviar estado nuevamente tras muerte
                 ReviveInteractionManager.cancelIfBeingRevived(uuid);
             });
         }

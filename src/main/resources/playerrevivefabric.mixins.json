@@ -8,7 +8,8 @@
     "ServerPlayerTickMixin",
     "LivingEntityMixin",
     "SwimmingPoseMixin",
-    "EntitySwimmingMixin"
+    "EntitySwimmingMixin",
+    "ServerPlayerRespawnMixin"
   ],
   "injectors": {
     "defaultRequire": 1
