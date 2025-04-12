@@ -17,8 +17,20 @@ public class ReviveInteractionManager {
         ServerPlayerEntity downedPlayer = server.getPlayerManager().getPlayer(downed);
         if (downedPlayer == null) return;
 
+        // Nueva verificación: Si el jugador ya no está derribado, se cancela la solicitud.
+        if (!PlayerReviveData.isDowned(downed)) {
+            reviver.sendMessage(
+                    Text.literal("Este jugador ya ha sido revivido").formatted(Formatting.RED),
+                    false
+            );
+            return;
+        }
+
         if (PlayerReviveData.isBeingRevived(downed)) {
-            reviver.sendMessage(Text.literal("Este jugador ya está siendo levantado por alguien").formatted(Formatting.RED), false);
+            reviver.sendMessage(
+                    Text.literal("Este jugador ya está siendo levantado por alguien").formatted(Formatting.RED),
+                    false
+            );
             return;
         }
 
@@ -27,6 +39,7 @@ public class ReviveInteractionManager {
         ReviveProgressTracker tracker = new ReviveProgressTracker(downed, reviver, 100);
         activeRevives.put(downed, tracker);
     }
+
 
     public static void handleCancelRevive(MinecraftServer server, ServerPlayerEntity reviver, UUID downed) {
         ReviveProgressTracker tracker = activeRevives.get(downed);
