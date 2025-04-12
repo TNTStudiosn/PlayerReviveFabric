@@ -29,8 +29,7 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
             boolean downed = buf.readBoolean();
 
             client.execute(() -> {
-                if (PlayerReviveData.hasAcceptedDeath(affectedPlayerUuid)) return;
-
+                // Siempre actualizar el estado downed, incluso si hasAcceptedDeath es true
                 PlayerReviveData.setDowned(affectedPlayerUuid, downed);
 
                 if (client.player != null && client.player.getUuid().equals(affectedPlayerUuid)) {
@@ -39,12 +38,12 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
                             client.setScreen(new ReviveGui(ReviveConfig.get().defaultReviveTicks));
                         }
                     } else {
+                        // Forzar limpieza del estado y cerrar GUI si está abierta
+                        PlayerReviveData.clear(affectedPlayerUuid);
                         if (client.currentScreen instanceof ReviveGui) {
                             client.setScreen(null);
                         }
-                        PlayerReviveData.clear(affectedPlayerUuid);
                     }
-
                 }
             });
         });
@@ -82,7 +81,5 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
             RevivePacketsClient.sendStartRevive(downed.getUuid());
             return ActionResult.SUCCESS;
         });
-
-
     }
 }

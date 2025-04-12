@@ -48,6 +48,8 @@ public class ReviveTimerManager {
         lastSentSeconds.remove(uuid);
     }
 
+    public static final float DAMAGE_MULTIPLIER = 100.0F;
+
     public static void forceDeath(ServerPlayerEntity player) {
         UUID uuid = player.getUuid();
         stopTimer(uuid);
@@ -58,9 +60,14 @@ public class ReviveTimerManager {
         DamageSource source = PlayerReviveData.getLastDamageSource(player);
         if (player.getServer() != null) {
             player.getServer().execute(() -> {
+                // Restauramos la salud al máximo antes de aplicar el daño letal
                 player.setHealth(player.getMaxHealth());
-                player.damage(source, Float.MAX_VALUE);
 
+                // Se calcula el daño letal como un múltiplo de la salud máxima del jugador
+                float lethalDamage = player.getMaxHealth() * DAMAGE_MULTIPLIER;
+                player.damage(source, lethalDamage);
+
+                // En caso de que el jugador siga vivo, se fuerza la muerte asignando 0 de salud
                 if (player.isAlive()) {
                     player.setHealth(0.0F);
                     player.getServer().getPlayerManager().broadcast(
@@ -70,10 +77,11 @@ public class ReviveTimerManager {
                 }
                 // Limpiar estados y forzar sincronización
                 PlayerReviveData.clear(uuid);
-                PlayerReviveNetwork.sendDownedState(player, false); // Enviar estado nuevamente tras muerte
+                PlayerReviveNetwork.sendDownedState(player, false); // Enviar estado nuevamente tras la muerte
             });
         }
     }
+
 
     private static void killPlayer(ServerPlayerEntity player) {
         UUID uuid = player.getUuid();

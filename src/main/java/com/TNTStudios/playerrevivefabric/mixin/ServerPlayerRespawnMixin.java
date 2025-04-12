@@ -21,6 +21,10 @@ public abstract class ServerPlayerRespawnMixin {
         // Reiniciar todos los estados al reaparecer
         PlayerReviveData.setDowned(uuid, false);
         PlayerReviveData.clear(uuid);
-        PlayerReviveNetwork.sendDownedState(player, false); // Forzar sincronización tras respawn
+        PlayerReviveNetwork.sendDownedState(player, false); // Enviar a todos los clientes
+        // Forzar sincronización específica para el jugador que reaparece
+        player.getServer().execute(() -> {
+            PlayerReviveNetwork.sendDownedState(player, false);
+        });
     }
 }
