@@ -50,7 +50,11 @@ public class ReviveProgressTracker {
         PlayerReviveData.clear(downed);
         PlayerReviveData.clearReviving(downed);
 
-        downedPlayer.setHealth(downedPlayer.getMaxHealth());
+        // Establecemos la salud al porcentaje configurado
+        float maxHealth = downedPlayer.getMaxHealth();
+        float reviveHealth = Math.max(1.0F, maxHealth * ReviveConfig.get().reviveHealthPercentage);
+        downedPlayer.setHealth(reviveHealth);
+
         RevivePackets.sendTimerUpdate(downedPlayer, 0);
         PlayerReviveNetwork.sendDownedState(downedPlayer, false);
         RevivePackets.sendSuccess(downedPlayer);
@@ -78,4 +82,3 @@ public class ReviveProgressTracker {
         player.getHungerManager().setFoodLevel(Math.max(current / 2, 1));
     }
 }
-

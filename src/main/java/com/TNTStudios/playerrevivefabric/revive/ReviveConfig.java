@@ -18,6 +18,7 @@ public class ReviveConfig {
     private static ReviveConfig INSTANCE;
 
     public int defaultReviveTicks = 2400;
+    public float reviveHealthPercentage = 0.5F; // 50% de la salud máxima por defecto
 
     /**
      * Inicializa la configuración.
@@ -54,9 +55,15 @@ public class ReviveConfig {
             }
             try (FileReader reader = new FileReader(CONFIG_FILE)) {
                 INSTANCE = GSON.fromJson(reader, ReviveConfig.class);
+                // Validar defaultReviveTicks
                 if (INSTANCE.defaultReviveTicks <= 0) {
                     LOGGER.warning("El valor de defaultReviveTicks no es válido. Se restablecerá a 2400.");
                     INSTANCE.defaultReviveTicks = 2400;
+                }
+                // Validar reviveHealthPercentage
+                if (INSTANCE.reviveHealthPercentage <= 0.0F || INSTANCE.reviveHealthPercentage > 1.0F) {
+                    LOGGER.warning("El valor de reviveHealthPercentage no es válido. Se restablecerá a 0.5.");
+                    INSTANCE.reviveHealthPercentage = 0.5F;
                 }
             }
             LOGGER.info("Configuración cargada correctamente.");
