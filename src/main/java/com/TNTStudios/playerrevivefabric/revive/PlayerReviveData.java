@@ -1,5 +1,7 @@
 package com.TNTStudios.playerrevivefabric.revive;
 
+import com.TNTStudios.playerrevivefabric.network.PlayerReviveNetwork;
+import com.TNTStudios.playerrevivefabric.util.ServerUtil;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 
@@ -24,6 +26,11 @@ public class PlayerReviveData {
             downedPlayers.add(playerId);
         } else {
             downedPlayers.remove(playerId);
+        }
+        // Notificar a todos los clientes
+        ServerPlayerEntity player = ServerUtil.getPlayer(playerId);
+        if (player != null) {
+            PlayerReviveNetwork.sendDownedState(player, downed);
         }
     }
 
