@@ -17,4 +17,11 @@ public class PlayerReviveNetwork {
             ServerPlayNetworking.send(recipient, SET_DOWNED_PACKET, buf);
         }
     }
+
+    public static void sendDownedState(ServerPlayerEntity downedPlayer, boolean downed, ServerPlayerEntity recipient) {
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        buf.writeUuid(downedPlayer.getUuid());
+        buf.writeBoolean(downed);
+        ServerPlayNetworking.send(recipient, SET_DOWNED_PACKET, buf);
+    }
 }
