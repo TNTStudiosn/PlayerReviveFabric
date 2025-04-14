@@ -21,7 +21,6 @@ public abstract class ServerPlayerMixin {
 
         // Permitir daño si el jugador ha aceptado la muerte o el temporizador ha expirado
         if (PlayerReviveData.hasAcceptedDeath(player.getUuid()) || PlayerReviveData.hasTimerExpired(player.getUuid())) {
-            // Dejar que el daño se aplique normalmente
             return;
         }
 
@@ -31,14 +30,16 @@ public abstract class ServerPlayerMixin {
             return;
         }
 
-        // Si el daño es letal, activar el estado "downed"
-        if (player.getHealth() - amount <= 0.0F) {
+        float currentHealth = player.getHealth();
+        float resultingHealth = currentHealth - amount;
+
+        // Activar estado "downed" si se baja de 2 a 1 o menos (equivale a de 1 corazón a medio corazón o menos)
+        if (currentHealth > 1.0F && resultingHealth <= 1.0F) {
             PlayerReviveData.setDowned(player.getUuid(), true);
             PlayerReviveData.setLastDamageSource(player.getUuid(), source);
             PlayerReviveNetwork.sendDownedState(player, true);
             ReviveTimerManager.startTimer(player.getUuid());
 
-            // Enviar mensaje a todo el servidor
             String playerName = player.getName().getString();
             Text message = Text.literal("[" + playerName + "] está tirado en el suelo D:").formatted(Formatting.RED);
             if (player.getServer() != null) {
@@ -48,4 +49,5 @@ public abstract class ServerPlayerMixin {
             cir.setReturnValue(false);
         }
     }
+
 }

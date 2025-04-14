@@ -20,8 +20,5 @@ public abstract class ServerPlayerTickMixin {
         if (PlayerReviveData.isDowned(player.getUuid())) {
             player.setPose(EntityPose.SWIMMING);
         }
-        // Eliminado: if (player.getServer() != null && player.getServer().getTicks() % 2 == 0) {
-        //     ReviveInteractionManager.tickAll();
-        // }
     }
 }
