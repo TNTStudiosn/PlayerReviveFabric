@@ -19,35 +19,43 @@ public abstract class ServerPlayerMixin {
     public void onDamage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
 
-        // Permitir daño si el jugador ha aceptado la muerte o el temporizador ha expirado
+        // 1) Ignorar creativo / espectador
+        if (player.isCreative() || player.isSpectator()) {
+            return;
+        }
+
+        // 2) Ignorar si el jugador ya aceptó la muerte o el temporizador expiró
         if (PlayerReviveData.hasAcceptedDeath(player.getUuid()) || PlayerReviveData.hasTimerExpired(player.getUuid())) {
             return;
         }
 
-        // Si el jugador ya está derribado, cancelar el daño
+        // 3) Si ya está downed, no aplicar daño
         if (PlayerReviveData.isDowned(player.getUuid())) {
             cir.setReturnValue(false);
             return;
         }
 
+        // 4) Verificar si la vida después del daño quedará en < 1 (medio corazón)
         float currentHealth = player.getHealth();
         float resultingHealth = currentHealth - amount;
 
-        // Activar estado "downed" si se baja de 2 a 1 o menos (equivale a de 1 corazón a medio corazón o menos)
-        if (currentHealth > 1.0F && resultingHealth <= 1.0F) {
+        if (resultingHealth < 1.0F) {
+            // Activar estado "downed" y cancelar muerte
             PlayerReviveData.setDowned(player.getUuid(), true);
             PlayerReviveData.setLastDamageSource(player.getUuid(), source);
             PlayerReviveNetwork.sendDownedState(player, true);
             ReviveTimerManager.startTimer(player.getUuid());
 
+            // Mensaje global al servidor
             String playerName = player.getName().getString();
-            Text message = Text.literal("[" + playerName + "] está tirado en el suelo D:").formatted(Formatting.RED);
+            Text message = Text.literal("[" + playerName + "] está tirado en el suelo D:")
+                    .formatted(Formatting.RED);
             if (player.getServer() != null) {
                 player.getServer().getPlayerManager().broadcast(message, false);
             }
 
+            // Cancelar el daño letal
             cir.setReturnValue(false);
         }
     }
-
 }
