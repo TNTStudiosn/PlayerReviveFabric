@@ -4,8 +4,6 @@ import com.TNTStudios.playerrevivefabric.network.PlayerReviveNetwork;
 import com.TNTStudios.playerrevivefabric.network.RevivePackets;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 
 import java.util.Map;
 import java.util.UUID;
