@@ -4,6 +4,7 @@
   "package": "com.TNTStudios.playerrevivefabric.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ServerPlayerDeathMixin",
     "ServerPlayerMixin",
     "ServerPlayerTickMixin",
     "LivingEntityMixin",
