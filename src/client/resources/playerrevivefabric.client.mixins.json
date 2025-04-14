@@ -4,6 +4,7 @@
   "package": "com.TNTStudios.playerrevivefabric.client.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
+    "MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

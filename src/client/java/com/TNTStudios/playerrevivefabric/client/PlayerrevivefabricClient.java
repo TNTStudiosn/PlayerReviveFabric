@@ -95,5 +95,17 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
                 }
             });
         });
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.player != null && PlayerReviveData.isDowned(client.player.getUuid())) {
+                if (!(client.currentScreen instanceof ReviveGui)) {
+                    client.setScreen(new ReviveGui(ReviveConfig.get().defaultReviveTicks));
+                }
+            } else {
+                if (client.currentScreen instanceof ReviveGui) {
+                    client.setScreen(null);
+                }
+            }
+        });
     }
 }
