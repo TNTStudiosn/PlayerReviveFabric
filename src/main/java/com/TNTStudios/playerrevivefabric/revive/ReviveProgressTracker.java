@@ -27,12 +27,24 @@ public class ReviveProgressTracker {
 
         if (downedPlayer == null || reviverPlayer == null || reviverPlayer.isDead()) {
             cancel("interrupción por desconexión o muerte");
+            // Enviar actualización a todos los jugadores
+            if (ServerUtil.getServer() != null) {
+                for (ServerPlayerEntity recipient : ServerUtil.getServer().getPlayerManager().getPlayerList()) {
+                    RevivePackets.sendBeingRevivedUpdate(recipient, downed, null);
+                }
+            }
             return true;
         }
 
         double distance = downedPlayer.squaredDistanceTo(reviverPlayer);
         if (distance > MAX_DISTANCE_SQUARED) {
             cancel("te alejaste demasiado");
+            // Enviar actualización a todos los jugadores
+            if (ServerUtil.getServer() != null) {
+                for (ServerPlayerEntity recipient : ServerUtil.getServer().getPlayerManager().getPlayerList()) {
+                    RevivePackets.sendBeingRevivedUpdate(recipient, downed, null);
+                }
+            }
             return true;
         }
 
@@ -50,7 +62,6 @@ public class ReviveProgressTracker {
         PlayerReviveData.clear(downed);
         PlayerReviveData.clearReviving(downed);
 
-        // Establecemos la salud al porcentaje configurado
         float maxHealth = downedPlayer.getMaxHealth();
         float reviveHealth = Math.max(1.0F, maxHealth * ReviveConfig.get().reviveHealthPercentage);
         downedPlayer.setHealth(reviveHealth);
@@ -59,6 +70,13 @@ public class ReviveProgressTracker {
         PlayerReviveNetwork.sendDownedState(downedPlayer, false);
         RevivePackets.sendSuccess(downedPlayer);
         RevivePackets.sendSuccess(reviverPlayer);
+
+        // Enviar actualización a todos los jugadores
+        if (ServerUtil.getServer() != null) {
+            for (ServerPlayerEntity recipient : ServerUtil.getServer().getPlayerManager().getPlayerList()) {
+                RevivePackets.sendBeingRevivedUpdate(recipient, downed, null);
+            }
+        }
 
         reduceFood(downedPlayer);
         reduceFood(reviverPlayer);

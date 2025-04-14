@@ -18,7 +18,7 @@ public class ReviveTimerManager {
 
     public static void tick(ServerPlayerEntity player) {
         UUID uuid = player.getUuid();
-        if (!PlayerReviveData.isDowned(uuid)) return;
+        if (!PlayerReviveData.isDowned(uuid) || PlayerReviveData.isBeingRevived(uuid)) return;
 
         timers.computeIfPresent(uuid, (id, ticksLeft) -> {
             if (ticksLeft <= 1) {

@@ -3,6 +3,7 @@ package com.TNTStudios.playerrevivefabric.client;
 import com.TNTStudios.playerrevivefabric.client.gui.ReviveGui;
 import com.TNTStudios.playerrevivefabric.client.gui.ReviveProgressHud;
 import com.TNTStudios.playerrevivefabric.network.PlayerReviveNetwork;
+import com.TNTStudios.playerrevivefabric.network.RevivePackets;
 import com.TNTStudios.playerrevivefabric.revive.PlayerReviveData;
 import com.TNTStudios.playerrevivefabric.revive.ReviveConfig;
 import net.fabricmc.api.ClientModInitializer;
@@ -80,6 +81,19 @@ public class PlayerrevivefabricClient implements ClientModInitializer {
 
             RevivePacketsClient.sendStartRevive(downed.getUuid());
             return ActionResult.SUCCESS;
+        });
+
+        ClientPlayNetworking.registerGlobalReceiver(RevivePackets.SET_BEING_REVIVED, (client, handler, buf, responseSender) -> {
+            UUID downedUuid = buf.readUuid();
+            boolean hasReviver = buf.readBoolean();
+            UUID reviverUuid = hasReviver ? buf.readUuid() : null;
+            client.execute(() -> {
+                if (reviverUuid != null) {
+                    PlayerReviveData.setBeingRevivedBy(downedUuid, reviverUuid);
+                } else {
+                    PlayerReviveData.clearReviving(downedUuid);
+                }
+            });
         });
     }
 }

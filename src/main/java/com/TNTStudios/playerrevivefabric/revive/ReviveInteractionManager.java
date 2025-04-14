@@ -1,5 +1,6 @@
 package com.TNTStudios.playerrevivefabric.revive;
 
+import com.TNTStudios.playerrevivefabric.network.RevivePackets;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -17,7 +18,6 @@ public class ReviveInteractionManager {
         ServerPlayerEntity downedPlayer = server.getPlayerManager().getPlayer(downed);
         if (downedPlayer == null) return;
 
-        // Nueva verificación: Si el jugador ya no está derribado, se cancela la solicitud.
         if (!PlayerReviveData.isDowned(downed)) {
             reviver.sendMessage(
                     Text.literal("Este jugador ya ha sido revivido").formatted(Formatting.RED),
@@ -35,9 +35,13 @@ public class ReviveInteractionManager {
         }
 
         PlayerReviveData.setBeingRevivedBy(downed, reviver.getUuid());
-        ReviveTimerManager.stopTimer(downed);
         ReviveProgressTracker tracker = new ReviveProgressTracker(downed, reviver, 100);
         activeRevives.put(downed, tracker);
+
+        // Enviar actualización a todos los jugadores
+        for (ServerPlayerEntity recipient : server.getPlayerManager().getPlayerList()) {
+            RevivePackets.sendBeingRevivedUpdate(recipient, downed, reviver.getUuid());
+        }
     }
 
 
@@ -46,6 +50,10 @@ public class ReviveInteractionManager {
         if (tracker != null && tracker.getReviver().equals(reviver.getUuid())) {
             activeRevives.remove(downed);
             PlayerReviveData.clearReviving(downed);
+            // Enviar actualización a todos los jugadores
+            for (ServerPlayerEntity recipient : server.getPlayerManager().getPlayerList()) {
+                RevivePackets.sendBeingRevivedUpdate(recipient, downed, null);
+            }
         }
     }
 

@@ -12,6 +12,10 @@ public class ServerUtil {
         server = srv;
     }
 
+    public static MinecraftServer getServer() {
+        return server;
+    }
+
     public static ServerPlayerEntity getPlayer(UUID uuid) {
         return server != null ? server.getPlayerManager().getPlayer(uuid) : null;
     }
