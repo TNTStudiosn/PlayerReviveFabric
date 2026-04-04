@@ -27,11 +27,6 @@ public class PlayerReviveData {
         } else {
             downedPlayers.remove(playerId);
         }
-        // Notificar a todos los clientes
-        ServerPlayerEntity player = ServerUtil.getPlayer(playerId);
-        if (player != null) {
-            PlayerReviveNetwork.sendDownedState(player, downed);
-        }
     }
 
     public static void setLastDamageSource(UUID uuid, DamageSource source) {

@@ -17,6 +17,7 @@ public class Playerrevivefabric implements ModInitializer {
     public void onInitialize() {
         ReviveConfig.init();
         RevivePackets.registerServer();
+        com.TNTStudios.playerrevivefabric.command.RevivirCommand.register();
 
         ServerUtil.setServer(null);
 
