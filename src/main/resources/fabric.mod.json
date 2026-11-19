@@ -6,7 +6,7 @@
   "description": "Revive jugadores antes que acabe el tiempo",
   "authors": [],
   "contact": {},
-  "license": "All-Rights-Reserved",
+  "license": "LGPL-3.0-only",
   "icon": "assets/playerrevivefabric/icon.png",
   "environment": "*",
   "entrypoints": {
