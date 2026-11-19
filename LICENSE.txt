@@ -1,4 +1,12 @@
-Copyright (c) 2025 TNTStudios
-All rights reserved.
 
--si se esta en modo creativo no funciona, ni en espectadoor, la solucion es que si se esta en estos modos los cambia a survival
+## License
+
+PlayerReviveFabric is licensed under the GNU Lesser General
+Public License v3.0 (LGPL-3.0-only).
+
+Copyright (c) 2025 TNTStudios.
+
+Based on the original PlayerRevive project by CreativeMD:
+https://github.com/CreativeMD/PlayerRevive
+
+Original authors retain their respective copyrights.
